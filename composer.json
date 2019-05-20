@@ -1,0 +1,25 @@
+{
+    "name": "samir/fenditt",
+    "description": "FENDit",
+    "authors": [
+        {
+            "name": "Samir Ergaibi",
+            "email": "samirergaibi@gmail.com"
+        }
+    ],
+    "require": {
+        "slim/slim": "^3.12",
+        "slim/php-view": "^2.2"
+    },
+    "scripts": {
+        "start": "php -S localhost:8000 -t public"
+    },
+    "autoload": {
+        "psr-4": {
+            "": "src/classes"
+        }
+    },
+    "config": {
+        "process-timeout": 0
+    }
+}

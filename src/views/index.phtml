@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title><?=$title?></title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+<nav>
+  <a href="" data-template="home" id="home-btn">Home</a>
+  <a href="" data-template="register" id="register-btn">Register</a>
+  <a href="" data-template="login" id="login-btn">Login</a>
+</nav>
+<?php
+
+  require __DIR__ . "/templates/home-template.phtml";
+  require __DIR__ . "/templates/login-template.phtml";
+  require __DIR__ . "/templates/register-template.phtml";
+
+?>
+<div class="container">  
+  <header>
+    <h1><?=$title?></h1>
+  </header> 
+  <main>
+    <!-- INNEHÅLL -->
+  </main>
+</div>
+  <script type="text/javascript" src="main.js"></script>
+</body>
+</html>
