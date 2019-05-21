@@ -12,12 +12,16 @@
   // Register our dependencies through our container
   $dependencies = require __DIR__ . '/../src/container.php';
   $dependencies($app);
+  
+  $view = require __DIR__ . '/../src/routes/view.php';
+  $view($app);
 
   $entries = require __DIR__ . "/../src/routes/entries.php";
   $entries($app);
 
-  $view = require __DIR__ . '/../src/routes/view.php';
-  $view($app);
+  $user = require __DIR__ . "/../src/routes/user.php";
+  $user($app);
+
   
 
   // Run app
