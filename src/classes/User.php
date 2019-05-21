@@ -9,6 +9,13 @@
                 ":password" => password_hash($password, PASSWORD_BCRYPT)
             ]);
         }
+        public function checkIfUsernameIsTaken($username){
+            $statement = $this->db->prepare("SELECT * FROM users WHERE username = :username");
+            $statement->execute([
+                ":username" => $username
+            ]);
+            return $statement->fetch(PDO::FETCH_ASSOC);
+        }
     }
 
 

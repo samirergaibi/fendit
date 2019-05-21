@@ -4,7 +4,7 @@ const views= {
   home: ["#home-template"]
 }
 
-const fetchViews = {
+const viewFetches = {
   home: function(){
     fetch("/entries")
     .then(resp => resp.json())
@@ -42,27 +42,27 @@ function renderView(view){
 
 }
 renderView(views.home);
-fetchViews.home();
+viewFetches.home();
 
 const menuItems = document.querySelectorAll("nav a");
-
 menuItems.forEach(menuItem => {
   menuItem.addEventListener("click", function(e){
     e.preventDefault();
 
     let viewName = e.target.dataset.template;
     renderView(views[viewName]);
-    if(fetchViews[viewName]){
-      fetchViews[viewName]();
+    if(viewFetches[viewName]){
+      viewFetches[viewName]();
     }
 
     // We have to do this here, can't access the form outside (when rendering view it creates a new instance of the content)
     if(viewName === "register"){
       const registerForm = document.getElementById("register-form");
       registerForm.addEventListener("submit", e => {
-        e. preventDefault();
+        e.preventDefault();
 
         const formData = new FormData(registerForm);
+        const registerMsg = document.getElementById("register-msg");
         fetch("/register", {
           method: "POST",
           body: formData
@@ -71,10 +71,15 @@ menuItems.forEach(menuItem => {
             throw new Error(resp.statusText);
           }
           else{
-            // Confirm the registration here
-            console.log("Account created.");
+            registerMsg.innerText = "Account has been succefully created.";
+            registerMsg.style.color = "#4BB543";
+            registerMsg.classList.remove("hidden");
           }
-        }).catch(err => console.log(err));
+        }).catch(err => {
+          registerMsg.innerText = "Username is already in use, please choose another one.";
+          registerMsg.style.color = "#e74c3c";
+          registerMsg.classList.remove("hidden");
+        });
       })
     }
 
