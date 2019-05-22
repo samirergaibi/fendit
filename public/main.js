@@ -1,8 +1,28 @@
 const views= {
   login: ["#login-template"],
   register: ["#register-template"],
-  home: ["#home-template"]
+  home: ["#home-template"],
+  user: ["#user-template"]
 }
+
+const api = {
+  ping: function(){
+    fetch("/api/ping")
+    .then(resp => {
+      if(!resp.ok){
+        console.log(resp);
+        throw new Error("Du är inte inloggad");
+      }else{
+        return resp.json();
+      }
+    })
+    .then(data => {
+      console.log(data);
+      return data;
+    })
+  }
+}
+
 
 const viewFetches = {
   home: function(){
@@ -39,8 +59,12 @@ function renderView(view){
     div.innerHTML = templateMarkup;
     target.append(div);
   });
-
 }
+
+// Do this first when entering site
+const loggedInNav = document.getElementById("logged-in-nav");
+const loggedOutNav = document.getElementById("logged-out-nav");
+loggedInNav.style.display = "none";
 renderView(views.home);
 viewFetches.home();
 
@@ -81,6 +105,29 @@ menuItems.forEach(menuItem => {
           registerMsg.classList.remove("hidden");
         });
       })
+    }
+    else if(viewName === "login"){
+      const loginForm = document.getElementById("login-form");
+      loginForm.addEventListener("submit", function(e){
+        e.preventDefault();
+
+        const formData = new FormData(loginForm);
+        fetch("/login", {
+          method: "POST",
+          body: formData
+        }).then(resp => {
+          if(!resp.ok){
+            throw new Error(resp.statusText);
+          }else{
+            return resp.json();
+          }
+        }).then(data => {
+          console.log(data);
+          renderView(views.user);
+          loggedInNav.style.display = "block";
+          loggedOutNav.style.display = "none";
+        })
+      });
     }
 
 

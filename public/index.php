@@ -22,6 +22,9 @@
   $user = require __DIR__ . "/../src/routes/user.php";
   $user($app);
 
+  $login = require __DIR__ . "/../src/routes/login.php";
+  $login($app);
+
   
 
   // Run app

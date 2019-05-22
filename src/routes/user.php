@@ -6,7 +6,7 @@
             $user = new User($this->db);
             $data = $req->getParsedBody();
 
-            $userTaken = $user->checkIfUsernameIsTaken($data["username"]);
+            $userTaken = $user->getUser($data["username"]);
             if( $userTaken || strlen($data["username"]) < 1 || strlen($data["password"]) < 1 ){
                 return $resp->withStatus(409);
             }else{
