@@ -8,16 +8,22 @@
   <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-<nav>
+<nav id="logged-out-nav">
   <a href="" data-template="home" id="home-btn">Home</a>
   <a href="" data-template="register" id="register-btn">Register</a>
   <a href="" data-template="login" id="login-btn">Login</a>
+</nav>
+<nav id="logged-in-nav">
+  <a href="" data-template="user" id="user-home-btn">Home</a>
+  <a href="" data-template="coming-soon" id="coming-soon">Coming Soon</a>
+  <a href="" data-template="logout" id="logout-btn">Logout</a>
 </nav>
 <?php
 
   require __DIR__ . "/templates/home-template.phtml";
   require __DIR__ . "/templates/login-template.phtml";
   require __DIR__ . "/templates/register-template.phtml";
+  require __DIR__ . "/templates/user-template.phtml";
 
 ?>
 <div class="container">  

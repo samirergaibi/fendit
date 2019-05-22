@@ -9,7 +9,7 @@
                 ":password" => password_hash($password, PASSWORD_BCRYPT)
             ]);
         }
-        public function checkIfUsernameIsTaken($username){
+        public function getUser($username){
             $statement = $this->db->prepare("SELECT * FROM users WHERE username = :username");
             $statement->execute([
                 ":username" => $username
