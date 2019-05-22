@@ -26,7 +26,7 @@ const api = {
 
 const viewFetches = {
   home: function(){
-    fetch("/entries")
+    fetch("/api/entries")
     .then(resp => resp.json())
     .then(data => {
         const entryContainer = document.getElementById("entry-container");
@@ -36,6 +36,7 @@ const viewFetches = {
                 <h3>${entry.title}</h3>
                 <p>${entry.createdBy}</p>
                 <p>${entry.createdAt}</p>
+                <button data-entryID='${entry.entryID}'>Edit</button>
             </div>`;
         })
     });
@@ -87,7 +88,7 @@ menuItems.forEach(menuItem => {
 
         const formData = new FormData(registerForm);
         const registerMsg = document.getElementById("register-msg");
-        fetch("/register", {
+        fetch("/api/register", {
           method: "POST",
           body: formData
         }).then(resp => {
@@ -112,7 +113,8 @@ menuItems.forEach(menuItem => {
         e.preventDefault();
 
         const formData = new FormData(loginForm);
-        fetch("/login", {
+        // formData.set("entryID", e.target.dataset["entryID"]);
+        fetch("/api/login", {
           method: "POST",
           body: formData
         }).then(resp => {
