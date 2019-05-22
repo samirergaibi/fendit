@@ -16,6 +16,12 @@
             ]);
             return $statement->fetch(PDO::FETCH_ASSOC);
         }
+        public function getAllUsernames(){
+            $statement = $this->db->prepare("SELECT username FROM users");
+            $statement->execute();
+
+            return $statement->fetchAll(PDO::FETCH_ASSOC);
+        }
     }
 
 

@@ -2,7 +2,7 @@
 
     return function($app){
 
-        $app->post("/register", function($req, $resp){
+        $app->post("/api/register", function($req, $resp){
             $user = new User($this->db);
             $data = $req->getParsedBody();
 
@@ -12,6 +12,11 @@
             }else{
                 $user->registerUser($data["username"], $data["password"]);
             }
+        });
+
+        $app->get("/api/users", function($req, $resp){
+            $user = new User($this->db);
+            return $resp->withJson($user->getAllUsernames());
         });
 
     }
