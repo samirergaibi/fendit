@@ -5,7 +5,7 @@ return function ($app) {
   $auth = require __DIR__ . '/../middlewares/auth.php';
 
   // Add a login route
-  $app->post('/login', function ($request, $response) {
+  $app->post('/api/login', function ($request, $response) {
     $data = $request->getParsedBody();
     if ($data['username'] && $data['password']) {
         $user = new User($this->db);
@@ -14,20 +14,26 @@ return function ($app) {
             if( password_verify($data["password"], $userFromDb["password"]) ){
                 $_SESSION['loggedIn'] = true;
                 $_SESSION['username'] = $userFromDb['username'];
-                return $response->withJson($userFromDb);
+                return $response->withJson([
+                  "message" => "Welcome {$userFromDb['username']}",
+                  "loggedIn" => true
+                ]);
             }else{
                 return $response->withJson([
-                    "message" => "Wrong password."
+                    "message" => "Wrong password.",
+                    "loggedIn" => false
                 ]);
             }
         }else{
             return $response->withJson([
-                "message" => "user does not exist."
+                "message" => "user does not exist.",
+                "loggedIn" => false
             ]);
         }
     }else {
       return $response->withJson([
-          "message" => "You must fill out both fields stupid.."
+          "message" => "You must fill out both fields stupid..",
+          "loggedIn" => false
       ]);
     }
   });
@@ -36,6 +42,7 @@ return function ($app) {
   $app->get('/api/ping', function ($request, $response, $args) {
     return $response->withJson(['loggedIn' => true]);
   })->add($auth);
+  
 };
 
 
