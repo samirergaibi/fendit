@@ -13,6 +13,12 @@
             $userID = $args['userID'];
             return $resp->withJson($entry->getUserEntries($userID));
         });
+        $app->get("/api/fullentry/{entryID}", function($req, $resp, $args){
+            $entryID = $args['entryID'];
+            $entry = new Entry($this->db);
+            return $resp->withJson($entry->fullEntry($entryID));
+        });
+
         $app->post("/api/entry/{userID}", function($req,$resp,$args){
             $entry = new Entry($this->db);
             $userID = $args['userID'];
