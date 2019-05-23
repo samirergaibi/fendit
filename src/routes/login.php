@@ -13,6 +13,7 @@ return function ($app) {
         if( $userFromDb ){
             if( password_verify($data["password"], $userFromDb["password"]) ){
                 $_SESSION['loggedIn'] = true;
+                $_SESSION["userID"] = $userFromDb["userID"];
                 $_SESSION['username'] = $userFromDb['username'];
                 return $response->withJson([
                   "message" => "Welcome {$userFromDb['username']}",
