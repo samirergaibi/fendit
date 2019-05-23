@@ -3,8 +3,8 @@ const views = {
   register: ["#register-template"],
   home: ["#home-template"],
   logout: ["#home-template"],
-  entry: ['#full-entry']
-
+  entry: ['#full-entry-template'],
+  userEntries: ["#user-entries-template"]
 }
 
 const viewFetches = {
@@ -25,17 +25,18 @@ const viewFetches = {
             loggedOutNav.style.display = "block";
             loggedInNav.style.display = "none";
           }
-          entryContainer.innerHTML +=
-            `<div class="entry">
-                <h3>${entry.title}</h3>
-                <p>${entry.username}</p>
-                <p>${entry.createdAt}</p>
-                <button class="see-full-entry" data-entryID='${entry.entryID}'>See Full Entry</button>
-                ${btn}
-            </div>`;
+          entryContainer.innerHTML +=`
+          <div class="entry">
+            <h3>${entry.title}</h3>
+            <p>${entry.username}</p>
+            <p>${entry.createdAt}</p>
+            <button class="see-full-entry" data-entryID='${entry.entryID}'>See Full Entry</button>
+            ${btn}
+          </div>`;
         })
-        goToFullEntry();
-      });
+        userEvents.goToFullEntry();
+    })
+      .catch(err => console.log(err));
   },
   register: function (formData, registerMsg) {
     fetch("/api/register", {
@@ -76,6 +77,7 @@ const viewFetches = {
         errorMsg.innerText = data.message;
       }
     })
+      .catch(err => console.log(err));
   },
   entry: function (loggedIn = false, entryID) {
     fetch(`/api/fullentry/${entryID}`)
@@ -90,13 +92,62 @@ const viewFetches = {
         renderView(views.entry);
         entryContainer = document.getElementById('entry-container');
         entryContainer.innerHTML = `
-                <h1>${data.title}</h1>
-                <p>${data.content}<p>
-                <p>${data.createdBy}<p>
-                <p>${data.createdAt}<p>
-                ${btn} `;
+        <h1>${data.title}</h1>
+        <p>${data.content}<p>
+        <p>${data.createdBy}<p>
+        <p>${data.createdAt}<p>
+        ${btn}`;
       })
       .catch(err => console.log(err));
+  },
+  userEntries: function(){
+    fetch(`/api/userentries`)
+      .then(resp => resp.json())
+      .then(data => {
+        const createEntryContainer = document.getElementById("create-entry-container");
+        createEntryContainer.innerHTML += `
+        <form id="create-entry-form">
+          <label for="title">Title</label>
+          <input type="text" name="title" id="title" autocomplete="off">
+          <label for="content">Content</label>
+          <textarea name="content" id="content" cols="60" rows="10"></textarea>
+          <input type="submit" value="Create">
+        </form>`;
+        data.forEach(entry => {
+          const userEntriesContainer = document.getElementById("user-entries-container");
+          userEntriesContainer.innerHTML += `
+          <div class="entry">
+            <h1>${entry.title}</h1>
+            <p>${entry.content}</p>
+            <p>${entry.username}</p>
+            <p>${entry.createdAt}</p>
+            <button>Edit</button>
+            <button>Remove</button>
+          </div>`;
+        })
+        userEvents.createEntry();
+      })
+      .catch(err => console.log(err));
+  }
+}
+
+const userEvents = {
+  goToFullEntry: function(){
+    const fullEntry = document.querySelectorAll(".entry .see-full-entry");
+    fullEntry.forEach(entry => {
+      entry.addEventListener('click', function (e) {
+        const entryID = e.target.dataset.entryid;
+        showCorrectView('entry', entryID)
+      })
+    })
+  },
+  createEntry: function(){
+    const createEntryForm = document.getElementById("create-entry-form");
+    createEntryForm.addEventListener("submit", e => {
+      e.preventDefault();
+      // Här vill jag skapa ett inlägg
+      console.log("hi");
+    })
   }
 }
 
@@ -111,8 +162,8 @@ function renderView(view) {
   });
 }
 
-// When entering site we ping to check if the user is logged in or not
-function showRightView(view, entryID) {
+// When entering site we ping to check if the user is logged in or not and show appropriate view
+function showCorrectView(view, entryID) {
   fetch("/api/ping")
     .then(resp => {
       if (!resp.ok) {
@@ -136,7 +187,7 @@ function showRightView(view, entryID) {
       viewFetches[view](false, entryID);
     });
 }
-showRightView("home");
+showCorrectView("home");
 
 const menuItems = document.querySelectorAll("nav a");
 menuItems.forEach(menuItem => {
@@ -147,7 +198,7 @@ menuItems.forEach(menuItem => {
     renderView(views[viewName]);
 
     if (viewName === "home") {
-      showRightView("home");
+      showCorrectView("home");
     } else if (viewName === "register") {
       const registerForm = document.getElementById("register-form");
       registerForm.addEventListener("submit", e => {
@@ -168,16 +219,8 @@ menuItems.forEach(menuItem => {
       console.log("LOGOUT");
       fetch("/api/logout");
       viewFetches.home();
+    } else if (viewName === "userEntries"){
+      viewFetches.userEntries();
     }
   });
 });
-
-function goToFullEntry() {
-  const fullEntry = document.querySelectorAll(".entry .see-full-entry");
-  fullEntry.forEach(entry => {
-    entry.addEventListener('click', function (e) {
-      const entryID = e.target.dataset.entryid;
-      showRightView('entry', entryID)
-    })
-  })
-}
