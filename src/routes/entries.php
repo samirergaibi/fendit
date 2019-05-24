@@ -20,7 +20,7 @@
             return $resp->withJson($entry->fullEntry($entryID));
         });
 
-        $app->post("/api/entry", function($req, $resp, $args){
+        $app->post("/api/entry", function($req, $resp){
             $entry = new Entry($this->db);
             $userID = $_SESSION["userID"];
             $data = $req->getParsedBody();

@@ -100,6 +100,7 @@ const viewFetches = {
       })
       .catch(err => console.log(err));
   },
+    // TOBBE JOBBA ÖVER DENNA KOMMENTAR OCH SAMIR UNDER
   userEntries: function(){
     fetch(`/api/userentries`)
       .then(resp => resp.json())
@@ -121,18 +122,15 @@ const viewFetches = {
             <p>${entry.content}</p>
             <p>${entry.username}</p>
             <p>${entry.createdAt}</p>
-            <button data-entryID="${entry.entryID}" id="edit-entry-btn">Edit</button>
-            <button data-entryID="${entry.entryID}" id="delete-entry-btn">Remove</button>
+            <button data-entryID="${entry.entryID}" class="edit-entry-btn">Edit</button>
+            <button data-entryID="${entry.entryID}" class="delete-entry-btn">Remove</button>
           </div>`;
         })
         userEventListeners.createEntry();
+        userEventListeners.editEntry();
       })
       .catch(err => console.log(err));
   }
-  ,
-  // SAMIR JOBBAR ÖVER DENNA KOMMENTAR
-  // TOBBE JOBBA UNDER DENNA KOMMENTAR
-  
 }
 
 const userEventListeners = {
@@ -172,8 +170,7 @@ const userEventListeners = {
     })
   },
   editEntry: function(){
-    const editEntryBtn = document.getElementById("edit-entry-btn");
-    // editEntryBtn.
+    const editEntryBtns = document.querySelectorAll(".edit-entry-btn")
   }
   ,
   // SAMIR JOBBAR ÖVER DENNA KOMMENTAR
