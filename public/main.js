@@ -117,13 +117,13 @@ const viewFetches = {
         data.forEach(entry => {
           const userEntriesContainer = document.getElementById("user-entries-container");
           userEntriesContainer.innerHTML += `
-          <div class="entry">
-            <h1>${entry.title}</h1>
-            <p>${entry.content}</p>
+          <div class="entry" id="entry-${entry.entryID}">
+            <h1 id="entry-title-${entry.entryID}">${entry.title}</h1>
+            <p id="entry-content-${entry.entryID}">${entry.content}</p>
             <p>${entry.username}</p>
             <p>${entry.createdAt}</p>
-            <button data-entryID="${entry.entryID}" class="edit-entry-btn">Edit</button>
-            <button data-entryID="${entry.entryID}" class="delete-entry-btn">Remove</button>
+            <button data-entryid="${entry.entryID}" class="edit-entry-btn">Edit</button>
+            <button data-entryid="${entry.entryID}" class="delete-entry-btn">Remove</button>
           </div>`;
         })
         userEventListeners.createEntry();
@@ -170,7 +170,42 @@ const userEventListeners = {
     })
   },
   editEntry: function(){
-    const editEntryBtns = document.querySelectorAll(".edit-entry-btn")
+    const editEntryBtns = document.querySelectorAll(".edit-entry-btn");
+    editEntryBtns.forEach(entryBtn => {
+      entryBtn.addEventListener("click", e => {
+        const entryID = e.target.dataset.entryid;
+        const entryContainer = document.querySelector(`#entry-${entryID}`);
+        const entryTitle = document.querySelector(`#entry-title-${entryID}`).innerText;
+        const entryContent = document.querySelector(`#entry-content-${entryID}`).innerText;
+        entryContainer.innerHTML += `
+          <form id="edit-entry-form">
+            <label for="title">Title</label>
+            <input type="text" name="title" id="title" autocomplete="off" value="${entryTitle}">
+            <label for="content">Content</label>
+            <textarea name="content" id="content" cols="60" rows="10">${entryContent}</textarea>
+            <input type="submit" value="Edit">
+          </form>`;
+          const editEntryForm = document.getElementById("edit-entry-form");
+          editEntryForm.addEventListener("click", e => {
+            e.preventDefault();
+
+            const formData = new FormData(editEntryForm);
+            fetch(`/api/entry/${entryID}`, {
+              method: "PUT",
+              body: formData
+            })
+            .then(resp => {
+              if(!resp.ok){
+                throw new Error(resp.statusText);
+              }else{
+                return resp.json();
+              }
+            })
+            .then(data => console.log(data))
+            .catch(err => console.log(err));
+          })
+      })
+    })
   }
   ,
   // SAMIR JOBBAR ÖVER DENNA KOMMENTAR
