@@ -20,11 +20,14 @@
             return $resp->withJson($entry->fullEntry($entryID));
         });
 
-        $app->post("/api/entry/{userID}", function($req, $resp, $args){
+        $app->post("/api/entry", function($req, $resp, $args){
             $entry = new Entry($this->db);
-            $userID = $args['userID'];
+            $userID = $_SESSION["userID"];
             $data = $req->getParsedBody();
-            $entry->createEntry($data['title'],$data['content'],$userID);
+            $entry->createEntry($data['title'], $data['content'], $userID);
+            return $resp->withJson([
+                "message" => "Entry has been succefully created."
+            ]);
          });
          
          $app->delete("/api/entry/{entryID}",function($req, $resp, $args){
@@ -37,7 +40,7 @@
            $entry = new Entry($this->db);
            $entryID = $args['entryID'];
            $data = $req->getParsedBody();
-           $entry->updateEntry($data['title'],$data['content'],$entryID);
+           $entry->updateEntry($data['title'], $data['content'], $entryID);
          });
 
     }
