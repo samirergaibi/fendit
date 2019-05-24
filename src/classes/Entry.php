@@ -25,6 +25,7 @@
             ]);
             return $statement->fetch(PDO::FETCH_ASSOC);
         }
+        
         public function createEntry($title, $content, $userID){
             $statement = $this->db->prepare("INSERT INTO entries(title, content, createdBy, createdAt) VALUES (:title, :content, :createdBy, NOW())");
             $statement->execute([

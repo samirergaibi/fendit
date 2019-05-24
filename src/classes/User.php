@@ -9,6 +9,7 @@
                 ":password" => password_hash($password, PASSWORD_BCRYPT)
             ]);
         }
+
         public function getUser($username){
             $statement = $this->db->prepare("SELECT * FROM users WHERE username = :username");
             $statement->execute([
@@ -16,6 +17,7 @@
             ]);
             return $statement->fetch(PDO::FETCH_ASSOC);
         }
+        
         public function getAllUsernames(){
             $statement = $this->db->prepare("SELECT username FROM users");
             $statement->execute();

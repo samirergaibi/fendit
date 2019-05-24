@@ -16,6 +16,7 @@
 
         $app->get("/api/users", function($req, $resp){
             $user = new User($this->db);
+            
             return $resp->withJson($user->getAllUsernames());
         });
 
