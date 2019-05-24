@@ -4,8 +4,9 @@ const views = {
   home: ["#home-template"],
   logout: ["#home-template"],
   entry: ['#full-entry-template'],
-  userEntries: ["#user-entries-template"]
-}
+  userEntries: ["#user-entries-template"],
+  users: ["#users-template"]
+};
 
 const viewFetches = {
   home: function (loggedIn = false) {
@@ -18,11 +19,11 @@ const viewFetches = {
         data.forEach(entry => {
           if (loggedIn) {
             btn = `<button  data-entryID='${entry.entryID}'>Comment</button>`;
-            loggedInNav.style.display = "block";
+            loggedInNav.style.display = "flex";
             loggedOutNav.style.display = "none";
           } else {
             btn = "";
-            loggedOutNav.style.display = "block";
+            loggedOutNav.style.display = "flex";
             loggedInNav.style.display = "none";
           }
           entryContainer.innerHTML +=`
@@ -30,7 +31,7 @@ const viewFetches = {
             <h3>${entry.title}</h3>
             <p>${entry.username}</p>
             <p>${entry.createdAt}</p>
-            <button class="see-full-entry" data-entryID='${entry.entryID}'>See Full Entry</button>
+            <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
             ${btn}
           </div>`;
         })
@@ -85,11 +86,9 @@ const viewFetches = {
       .then(data => {
         let btn;
         let commentBox;
-        
         if (loggedIn) {
           commentBox = `<textarea name="content" rows="4" cols="50"></textarea>`;
-          btn = `<button class="create-comment" data-entryID="${data.entryID}">Comment</button>`
-      
+          btn = `<button class="create-comment" data-entryID="${data.entryID}">Comment</button>`;
         } else {
           btn = "";
           commentBox = "";
@@ -105,7 +104,6 @@ const viewFetches = {
         ${commentBox}<br>
         ${btn}
         </form>`;
-        
       })
       .catch(err => console.log(err));
 
@@ -122,51 +120,63 @@ const viewFetches = {
         data.forEach(comment => {
           commentContainer.innerHTML += `
             <div class="comment">
-              <p>${comment.content}</p>
-              <p>${comment.username}</p>
-              <p>${comment.createdAt}</p>
+            <p class="small-text">${comment.username}</p>
+            <p class="small-text">${comment.createdAt}</p>
+            <p>${comment.content}</p>
             </div>`;
         })
         userEventListeners.createComment();
       })
-
       .catch(err => console.log(err));
   },
   userEntries: function(){
-    fetch(`/api/userentries`)
+    fetch("/api/user-entries")
       .then(resp => resp.json())
       .then(data => {
         const createEntryContainer = document.getElementById("create-entry-container");
         createEntryContainer.innerHTML += `
         <form id="create-entry-form">
-          <label for="title">Title</label>
-          <input type="text" name="title" id="title" autocomplete="off">
-          <label for="content">Content</label>
-          <textarea name="content" id="content" cols="60" rows="10"></textarea>
+          <textarea placeholder="Title" name="title" id="title" cols="60" rows="1"></textarea><br>
+          <textarea placeholder="Text" name="content" id="content" cols="60" rows="10"></textarea><br>
           <input type="submit" value="Create">
         </form>`;
         data.forEach(entry => {
           const userEntriesContainer = document.getElementById("user-entries-container");
           userEntriesContainer.innerHTML += `
           <div class="entry" id="entry-${entry.entryID}">
-            <h1 id="entry-title-${entry.entryID}">${entry.title}</h1>
+            <h2 id="entry-title-${entry.entryID}">${entry.title}</h2>
             <p id="entry-content-${entry.entryID}">${entry.content}</p>
             <p>${entry.username}</p>
             <p>${entry.createdAt}</p>
+            <button data-entryid="${entry.entryID}" class="full-entry-btn">Full Entry</button>
             <button data-entryid="${entry.entryID}" class="edit-entry-btn">Edit</button>
             <button data-entryid="${entry.entryID}" class="delete-entry-btn">Remove</button>
           </div>`;
         })
         userEventListeners.createEntry();
         userEventListeners.editEntry();
+        userEventListeners.deleteEntry();
+        userEventListeners.goToFullEntry();
       })
       .catch(err => console.log(err));
+  },
+  users: function(){
+    fetch("/api/users")
+      .then(resp => resp.json())
+      .then(data => {
+        const usersContainer = document.getElementById("users-container");
+        usersContainer.innerHTML = "<ul>";
+        data.forEach(user => {
+          usersContainer.innerHTML += `<li>${user.username}</li>`;
+        })
+        usersContainer.innerHTML += "</ul>";
+      })
   }
-}
+};
 
 const userEventListeners = {
   goToFullEntry: function(){
-    const fullEntry = document.querySelectorAll(".entry .see-full-entry");
+    const fullEntry = document.querySelectorAll(".full-entry-btn");
     fullEntry.forEach(entry => {
       entry.addEventListener('click', function (e) {
         const entryID = e.target.dataset.entryid;
@@ -214,15 +224,15 @@ const userEventListeners = {
             <input type="text" name="title" id="title" autocomplete="off" value="${entryTitle}">
             <label for="content">Content</label>
             <textarea name="content" id="content" cols="60" rows="10">${entryContent}</textarea>
-            <input type="submit" value="Edit">
+            <input type="submit" value="Confirm">
           </form>`;
           const editEntryForm = document.getElementById("edit-entry-form");
-          editEntryForm.addEventListener("click", e => {
+          editEntryForm.addEventListener("submit", e => {
             e.preventDefault();
 
             const formData = new FormData(editEntryForm);
-            fetch(`/api/entry/${entryID}`, {
-              method: "PUT",
+            fetch(`/api/edit-entry/${entryID}`, {
+              method: "POST",
               body: formData
             })
             .then(resp => {
@@ -232,9 +242,41 @@ const userEventListeners = {
                 return resp.json();
               }
             })
-            .then(data => console.log(data))
+            .then(data => {
+              renderView(views.userEntries);
+              viewFetches.userEntries();
+              // Vill helst stanna där man är på sidan men ändå uppdatera den.. Men man hamnar alltid längst upp
+              // Man kanske kan göra en fetch enbart på titlen och content?? Så att inte hela templaten laddas om
+            })
             .catch(err => console.log(err));
           })
+      })
+    })
+  },
+  deleteEntry: function(){
+    const deleteEntryBtns = document.querySelectorAll(".delete-entry-btn");
+    deleteEntryBtns.forEach(deleteBtn => {
+      deleteBtn.addEventListener("click", e => {
+        e.preventDefault();
+        entryID = e.target.dataset.entryid;
+        const confirmation = confirm("Are you sure that you want to delete this entry?");
+        if(confirmation){
+          fetch(`/api/entry/${entryID}`, {
+            method: "DELETE"
+          })
+            .then(resp => {
+              if(!resp.ok){
+                throw new Error(resp.statusText);
+              }else{
+                return resp.json();
+              }
+            })
+            .then(data => {
+              renderView(views.userEntries);
+              viewFetches.userEntries();
+            })
+            .catch(err => console.log(err));
+        }
       })
     })
   },
@@ -266,7 +308,7 @@ const userEventListeners = {
       .catch(err =>console.log(err));
     })
   }
-}
+};
 
 function renderView(view) {
   const target = document.querySelector("main");
@@ -277,7 +319,7 @@ function renderView(view) {
     div.innerHTML = templateMarkup;
     target.append(div);
   });
-}
+};
 
 // When entering site we ping to check if the user is logged in or not and show appropriate view
 function showCorrectView(view, entryID) {
@@ -303,7 +345,7 @@ function showCorrectView(view, entryID) {
       renderView(views[view]);
       viewFetches[view](false, entryID);
     });
-}
+};
 showCorrectView("home");
 
 const menuItems = document.querySelectorAll("nav a");
@@ -338,6 +380,8 @@ menuItems.forEach(menuItem => {
       viewFetches.home();
     } else if (viewName === "userEntries"){
       viewFetches.userEntries();
+    } else if (viewName === "users"){
+      viewFetches.users();
     }
   });
 });

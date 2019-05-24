@@ -4,7 +4,7 @@
 class Comment extends Connect{
 
     public function getComments($entryID){
-        $statement = $this->db->prepare("SELECT * FROM comments INNER JOIN users ON comments.createdBy = users.userID WHERE entryID = :entryID ORDER BY createdAt DESC");
+        $statement = $this->db->prepare("SELECT * FROM comments INNER JOIN users ON comments.createdBy = users.userID WHERE entryID = :entryID ORDER BY createdAt ASC");
         $statement->execute([
             ":entryID" => $entryID
         ]);
@@ -33,6 +33,7 @@ class Comment extends Connect{
         ]);
 
     }
+    
     public function deleteComment($commentID){
         $statement=  $this->db->prepare("DELETE from comments WHERE commentID = :commentID");
         $statement->execute([
