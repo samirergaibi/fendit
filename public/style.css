@@ -79,3 +79,15 @@ nav a{
   font-size: 0.8em;
   margin: 0 10px 0 0 ;
 }
+.highlight-author{
+  font-size:20px;
+  font-weight:bold;
+  color:#e74c3c;
+}
+#load-btn{
+  width:10%;
+  margin:0 auto;
+}
+.view-header{
+  text-align: center;
+}

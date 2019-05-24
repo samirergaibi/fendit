@@ -29,13 +29,42 @@ const viewFetches = {
           entryContainer.innerHTML +=`
           <div class="entry">
             <h3>${entry.title}</h3>
-            <p>${entry.username}</p>
-            <p>${entry.createdAt}</p>
+            <p>Written by: <span class="highlight-author">${entry.username}</span></p>
+            <p>Posted: ${entry.createdAt}</p>
             <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
             ${btn}
           </div>`;
         })
-        userEventListeners.goToFullEntry();
+        //load more entries
+        const loadBtn = document.getElementById('load-btn');
+        loadBtn.addEventListener('click', function () {
+          fetch("api/allentries")
+            .then(resp=> resp.json())
+            .then(data => {
+              loadBtn.style.display = 'none';
+              data.forEach(entry => {
+                if (loggedIn) {
+                  btn = `<button  data-entryID='${entry.entryID}'>Comment</button>`;
+                  loggedInNav.style.display = "flex";
+                  loggedOutNav.style.display = "none";
+                } else {
+                  btn = "";
+                  loggedOutNav.style.display = "flex";
+                  loggedInNav.style.display = "none";
+                }
+                entryContainer.innerHTML +=`
+                <div class="entry">
+                  <h3>${entry.title}</h3>
+                  <p>Written by: <span class="highlight-author">${entry.username}</span></p>
+                  <p>Posted: ${entry.createdAt}</p>
+                  <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
+                  ${btn}
+                </div>`;
+              })  
+              userEventListeners.goToFullEntry();
+            })
+          })
+          userEventListeners.goToFullEntry();
     })
       .catch(err => console.log(err));
   },
