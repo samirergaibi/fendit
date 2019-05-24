@@ -9,6 +9,12 @@
 
             return $statement->fetchAll(PDO::FETCH_ASSOC);
         }
+        public function allEntries(){
+            $statement = $this->db->prepare("SELECT * FROM entries INNER JOIN users ON entries.createdBy = users.userID ORDER BY createdAt DESC LIMIT 100 OFFSET 20");
+            $statement->execute();
+
+            return $statement->fetchAll(PDO::FETCH_ASSOC);
+        }
 
         public function getUserEntries($userID){
             $statement = $this->db->prepare("SELECT * FROM entries INNER JOIN users ON entries.createdBy = users.userID WHERE createdBy = :userID ORDER BY createdAt DESC");

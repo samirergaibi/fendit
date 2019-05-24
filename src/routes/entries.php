@@ -8,6 +8,11 @@
             
             return $resp->withJson($entry->getLatestEntries());
         });
+        $app->get("/api/allentries", function($req, $resp){
+            $entry = new Entry($this->db);
+            
+            return $resp->withJson($entry->allEntries());
+        });
 
         $app->get("/api/user-entries",function($req, $resp, $args){
             $entry = new Entry($this->db);
