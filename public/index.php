@@ -28,6 +28,9 @@
   $logout = require __DIR__ . "/../src/routes/logout.php";
   $logout($app);
 
+  $comment = require __DIR__ . "/../src/routes/comment.php";
+  $comment($app);
+
   
 
   // Run app

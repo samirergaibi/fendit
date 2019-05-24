@@ -3,6 +3,15 @@
 
 class Comment extends Connect{
 
+    public function getComments($entryID){
+        $statement = $this->db->prepare("SELECT * FROM comments INNER JOIN users ON comments.createdBy = users.userID WHERE entryID = :entryID");
+        $statement->execute([
+            ":entryID" => $entryID
+        ]);
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function createComment($entryID, $content, $createdBy){
         $statement = $this->db->prepare("INSERT INTO comments (entryID, content, createdBy, createdAt) VALUES (:entryID, :content, :createdBy, :createdAt)");
         date_default_timezone_set('europe/stockholm');
