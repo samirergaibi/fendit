@@ -1,6 +1,14 @@
 <?php
 
 return function($app){
+
+    $app->get("/api/comments/{entryID}", function($req, $resp, $args){
+        $comment = new Comment($this->db);
+        $entryID = $args["entryID"];
+        
+        return $resp->withJson($comment->getComments($entryID));
+    });
+
     $app->post('/api/comment', function($req, $res){
 
         $comment = new Comment($this->db);
@@ -9,9 +17,7 @@ return function($app){
         $createdBy = $createdBy['userID'];
         $data = $req->getParsedBody();
 
-       $comment->createComment($entryID, $data['content'], $createdBy ); 
-
-
+        $comment->createComment($entryID, $data['content'], $createdBy ); 
     });
 
     $app->put('/api/comment', function($req,$res){

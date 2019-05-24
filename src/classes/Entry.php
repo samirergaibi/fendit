@@ -19,7 +19,7 @@
         }
 
         public function fullEntry($entryID){
-            $statement = $this->db->prepare("SELECT * from entries WHERE entryID = :entryID");
+            $statement = $this->db->prepare("SELECT * FROM entries INNER JOIN users ON entries.createdBy = users.userID WHERE entryID = :entryID");
             $statement->execute([
                 ':entryID' => $entryID
             ]);

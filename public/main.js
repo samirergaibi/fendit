@@ -85,7 +85,7 @@ const viewFetches = {
       .then(data => {
         let btn;
         if (loggedIn) {
-          btn = `<button data-entryID="${data.entryID}">Comment</button>`
+          btn = `<button class="create-comment" data-entryID="${data.entryID}">Comment</button>`
         } else {
           btn = "";
         }
@@ -94,13 +94,33 @@ const viewFetches = {
         entryContainer.innerHTML = `
         <h1>${data.title}</h1>
         <p>${data.content}<p>
-        <p>${data.createdBy}<p>
+        <p>${data.username}<p>
         <p>${data.createdAt}<p>
         ${btn}`;
       })
       .catch(err => console.log(err));
+
+    fetch(`/api/comments/${entryID}`)
+      .then(resp => {
+        if(!resp.ok){
+          throw new Error(resp.statusText);
+        }else{
+          return resp.json();
+        }
+      })
+      .then(data => {
+        commentContainer = document.getElementById('comment-container');
+        data.forEach(comment => {
+          commentContainer.innerHTML = `
+            <div class="comment">
+              <p>${comment.content}</p>
+              <p>${comment.username}</p>
+              <p>${comment.createdAt}</p>
+            </div>`;
+        })
+      })
+      .catch(err => console.log(err));
   },
-    // TOBBE JOBBA ÖVER DENNA KOMMENTAR OCH SAMIR UNDER
   userEntries: function(){
     fetch(`/api/userentries`)
       .then(resp => resp.json())
@@ -207,10 +227,6 @@ const userEventListeners = {
       })
     })
   }
-  ,
-  // SAMIR JOBBAR ÖVER DENNA KOMMENTAR
-  // TOBBE JOBBA UNDER DENNA KOMMENTAR
-
 }
 
 function renderView(view) {
