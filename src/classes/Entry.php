@@ -11,7 +11,7 @@
         }
 
         public function getUserEntries($userID){
-            $statement = $this->db->prepare("SELECT * FROM entries INNER JOIN users ON entries.createdBy = users.userID WHERE createdBy = :userID");
+            $statement = $this->db->prepare("SELECT * FROM entries INNER JOIN users ON entries.createdBy = users.userID WHERE createdBy = :userID ORDER BY createdAt DESC");
             $statement->execute([
                 ":userID" => $userID
             ]);
@@ -25,8 +25,8 @@
             ]);
             return $statement->fetch(PDO::FETCH_ASSOC);
         }
-        public function createEntry($title,$content,$userID){
-            $statement = $this->db->prepare("INSERT INTO entries(title,content,createdBy,createdAt) VALUES (:title,:content,:createdBy,NOW())");
+        public function createEntry($title, $content, $userID){
+            $statement = $this->db->prepare("INSERT INTO entries(title, content, createdBy, createdAt) VALUES (:title, :content, :createdBy, NOW())");
             $statement->execute([
                 ":title" => $title ,
                 ":content" => $content,
@@ -41,7 +41,7 @@
             ]);
         }
 
-        public function updateEntry($title,$content,$entryID){
+        public function updateEntry($title, $content, $entryID){
             $statement = $this->db->prepare("UPDATE entries SET title = :title, content = :content WHERE entryID = :entryID");
             $statement->execute([
                 ":title" => $title,

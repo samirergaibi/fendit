@@ -34,7 +34,7 @@ const viewFetches = {
             ${btn}
           </div>`;
         })
-        userEvents.goToFullEntry();
+        userEventListeners.goToFullEntry();
     })
       .catch(err => console.log(err));
   },
@@ -121,17 +121,21 @@ const viewFetches = {
             <p>${entry.content}</p>
             <p>${entry.username}</p>
             <p>${entry.createdAt}</p>
-            <button>Edit</button>
-            <button>Remove</button>
+            <button data-entryID="${entry.entryID}" id="edit-entry-btn">Edit</button>
+            <button data-entryID="${entry.entryID}" id="delete-entry-btn">Remove</button>
           </div>`;
         })
-        userEvents.createEntry();
+        userEventListeners.createEntry();
       })
       .catch(err => console.log(err));
   }
+  ,
+  // SAMIR JOBBAR ÖVER DENNA KOMMENTAR
+  // TOBBE JOBBA UNDER DENNA KOMMENTAR
+  
 }
 
-const userEvents = {
+const userEventListeners = {
   goToFullEntry: function(){
     const fullEntry = document.querySelectorAll(".entry .see-full-entry");
     fullEntry.forEach(entry => {
@@ -145,10 +149,36 @@ const userEvents = {
     const createEntryForm = document.getElementById("create-entry-form");
     createEntryForm.addEventListener("submit", e => {
       e.preventDefault();
-      // Här vill jag skapa ett inlägg
-      console.log("hi");
+      const formData = new FormData(createEntryForm);
+      fetch("/api/entry", {
+        method: "POST",
+        body: formData
+      })
+        .then(resp => {
+          if(!resp.ok){
+            throw new Error(resp.statusText);
+          }else{
+            return resp.json();
+          }
+        })
+        .then(data => {
+          renderView(views.userEntries);
+          viewFetches.userEntries();
+          // Meddelandet skrivs inte ut, troligtvis pga. att det renderas innan ovanstående funktionsanrop
+          const createEntryMsg = document.getElementById("create-entry-msg");
+          createEntryMsg.innerHTML += `<p>${data.message}</p>`;
+        })
+        .catch(err => console.log(err));
     })
+  },
+  editEntry: function(){
+    const editEntryBtn = document.getElementById("edit-entry-btn");
+    // editEntryBtn.
   }
+  ,
+  // SAMIR JOBBAR ÖVER DENNA KOMMENTAR
+  // TOBBE JOBBA UNDER DENNA KOMMENTAR
+
 }
 
 function renderView(view) {
