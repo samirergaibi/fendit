@@ -84,10 +84,15 @@ const viewFetches = {
       .then(resp => resp.json())
       .then(data => {
         let btn;
+        let commentBox;
+        
         if (loggedIn) {
+          commentBox = `<textarea name="content" rows="4" cols="50"></textarea>`;
           btn = `<button class="create-comment" data-entryID="${data.entryID}">Comment</button>`
+      
         } else {
           btn = "";
+          commentBox = "";
         }
         renderView(views.entry);
         entryContainer = document.getElementById('entry-container');
@@ -96,7 +101,11 @@ const viewFetches = {
         <p>${data.content}<p>
         <p>${data.username}<p>
         <p>${data.createdAt}<p>
-        ${btn}`;
+        <form id="comment-form">
+        ${commentBox}<br>
+        ${btn}
+        </form>`;
+        
       })
       .catch(err => console.log(err));
 
@@ -111,14 +120,16 @@ const viewFetches = {
       .then(data => {
         commentContainer = document.getElementById('comment-container');
         data.forEach(comment => {
-          commentContainer.innerHTML = `
+          commentContainer.innerHTML += `
             <div class="comment">
               <p>${comment.content}</p>
               <p>${comment.username}</p>
               <p>${comment.createdAt}</p>
             </div>`;
         })
+        userEventListeners.createComment();
       })
+
       .catch(err => console.log(err));
   },
   userEntries: function(){
@@ -225,6 +236,34 @@ const userEventListeners = {
             .catch(err => console.log(err));
           })
       })
+    })
+  },
+  createComment: function(){
+    const createCommentBtn = document.querySelector('.create-comment');
+    const commentForm = document.getElementById('comment-form')
+    createCommentBtn.addEventListener('click',e=>{
+      e.preventDefault();
+      const entryID = e.target.dataset.entryid
+      const formData = new FormData(commentForm);
+      fetch(`/api/comment/${entryID}`,{
+        method:"POST",
+        body:formData
+      })
+      .then(resp => {
+        if(!resp.ok){
+          throw new Error(resp.statusText);
+        }else{
+          return resp.json();
+        }
+      })
+      .then(
+        data =>{
+          console.log(data);
+          showCorrectView('entry', entryID)
+        }
+        
+        )
+      .catch(err =>console.log(err));
     })
   }
 }

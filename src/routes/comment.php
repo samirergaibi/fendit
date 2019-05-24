@@ -9,15 +9,16 @@ return function($app){
         return $resp->withJson($comment->getComments($entryID));
     });
 
-    $app->post('/api/comment', function($req, $res){
+    $app->post('/api/comment/{entryID}', function($req, $res,$args){
 
         $comment = new Comment($this->db);
-        $user = new User($this->db);
-        $createdBy = $user->getUser($_SESSION['username']);
-        $createdBy = $createdBy['userID'];
+        $entryID = $args['entryID'];
+        $userID = $_SESSION["userID"];
         $data = $req->getParsedBody();
+        $comment->createComment($entryID, $data['content'], $userID ); 
+        return $res->withJson([
+            "message" => "Comment has been succefully created."]);
 
-        $comment->createComment($entryID, $data['content'], $createdBy ); 
     });
 
     $app->put('/api/comment', function($req,$res){
