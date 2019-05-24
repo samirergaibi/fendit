@@ -85,19 +85,27 @@ const viewFetches = {
       .then(data => {
         let btn;
         if (loggedIn) {
-          btn = `<button data-entryID="${data.entryID}">Comment</button>`
+          btn = `<button class="create-comment" data-entryID="${data.entryID}">Comment</button>`
         } else {
           btn = "";
         }
         renderView(views.entry);
         entryContainer = document.getElementById('entry-container');
+        commentContainer = document.getElementById('comment-container');
         entryContainer.innerHTML = `
         <h1>${data.title}</h1>
-        <p>${data.content}<p>
-        <p>${data.createdBy}<p>
-        <p>${data.createdAt}<p>
+        <p>${data.entryContent}<p>
+        <p>${data.entryCreatedBy}<p>
+        <p>${data.entryCreatedAt}<p>
         ${btn}`;
+        commentContainer.innerHTML = `
+        <p>${data.commentContent}</p>
+        <p>${data.commentCreatedBy}<p>
+        <p>${data.commentCreatedAt}</p>
+        `; 
+        
       })
+      
       .catch(err => console.log(err));
   },
     // TOBBE JOBBA ÖVER DENNA KOMMENTAR OCH SAMIR UNDER
@@ -171,8 +179,11 @@ const userEventListeners = {
   },
   editEntry: function(){
     const editEntryBtns = document.querySelectorAll(".edit-entry-btn")
+  },
+  createComment: function(){
+    console.log('hej');
   }
-  ,
+
   // SAMIR JOBBAR ÖVER DENNA KOMMENTAR
   // TOBBE JOBBA UNDER DENNA KOMMENTAR
 
