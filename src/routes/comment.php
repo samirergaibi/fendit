@@ -9,7 +9,7 @@ return function($app){
         return $resp->withJson($comment->getComments($entryID));
     });
 
-    $app->post('/api/comment/{entryID}', function($req, $res,$args){
+    $app->post('/api/comment/{entryID}', function($req, $res, $args){
         $comment = new Comment($this->db);
         $entryID = $args['entryID'];
         $userID = $_SESSION["userID"];
@@ -20,13 +20,14 @@ return function($app){
         ]);
     });
 
-    $app->put('/api/comment', function($req,$res){
+    $app->post('/api/edit-comment/{commentID}', function($req, $res, $args){
         $data = $req->getParsedBody();
+        $commentID = $args["commentID"];
         $comment = new Comment($this->db);
         $comment->editComment($data['content'], $commentID);
 
         return $res->withJson([
-            $message => 'Edit success!'
+            "message" => 'Edit was successful.'
         ]);
     });
 

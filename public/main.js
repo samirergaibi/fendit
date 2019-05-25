@@ -146,15 +146,29 @@ const viewFetches = {
       })
       .then(data => {
         commentContainer = document.getElementById('comment-container');
+        let editBtn;
+        let deleteBtn;
         data.forEach(comment => {
+          if (loggedIn) {
+            editBtn = `<button data-commentid="${comment.commentID}" class="edit-comment-btn">Edit</button>`;
+            deleteBtn = `<button data-commentid="${comment.commentID}" class="delete-comment-btn">Delete</button>`;
+          } else {
+            editBtn = "";
+            deleteBtn = "";
+          }
           commentContainer.innerHTML += `
-            <div class="comment">
+            <div class="comment" id="comment-${comment.commentID}">
             <p class="small-text">${comment.username}</p>
             <p class="small-text">${comment.createdAt}</p>
-            <p>${comment.content}</p>
+            <p id="comment-content-${comment.commentID}">${comment.content}</p>
+            ${editBtn}
+            ${deleteBtn}
             </div>`;
         })
-        userEventListeners.createComment();
+        if (loggedIn) {
+          userEventListeners.createComment();
+          userEventListeners.editComment();
+        }
       })
       .catch(err => console.log(err));
   },
@@ -248,22 +262,22 @@ const userEventListeners = {
         const entryTitle = document.querySelector(`#entry-title-${entryID}`).innerText;
         const entryContent = document.querySelector(`#entry-content-${entryID}`).innerText;
         entryContainer.innerHTML += `
-          <form id="edit-entry-form">
+          <form id="edit-entry-form-${entryID}">
             <label for="title">Title</label>
             <input type="text" name="title" id="title" autocomplete="off" value="${entryTitle}">
             <label for="content">Content</label>
             <textarea name="content" id="content" cols="60" rows="10">${entryContent}</textarea>
             <input type="submit" value="Confirm">
           </form>`;
-          const editEntryForm = document.getElementById("edit-entry-form");
-          editEntryForm.addEventListener("submit", e => {
-            e.preventDefault();
+        const editEntryForm = document.getElementById(`edit-entry-form-${entryID}`);
+        editEntryForm.addEventListener("submit", e => {
+          e.preventDefault();
 
-            const formData = new FormData(editEntryForm);
-            fetch(`/api/edit-entry/${entryID}`, {
-              method: "POST",
-              body: formData
-            })
+          const formData = new FormData(editEntryForm);
+          fetch(`/api/edit-entry/${entryID}`, {
+            method: "POST",
+            body: formData
+          })
             .then(resp => {
               if(!resp.ok){
                 throw new Error(resp.statusText);
@@ -278,7 +292,7 @@ const userEventListeners = {
               // Man kanske kan göra en fetch enbart på titlen och content?? Så att inte hela templaten laddas om
             })
             .catch(err => console.log(err));
-          })
+        })
       })
     })
   },
@@ -327,15 +341,48 @@ const userEventListeners = {
           return resp.json();
         }
       })
-      .then(
-        data =>{
+      .then(data => {
           console.log(data);
-          showCorrectView('entry', entryID)
-        }
-        
-        )
+          showCorrectView('entry', entryID)})
       .catch(err =>console.log(err));
     })
+  },
+  editComment: function(){
+    const editBtns = document.querySelectorAll(".edit-comment-btn");
+    editBtns.forEach(editBtn => {
+      editBtn.addEventListener("click", e => {
+        const commentID = e.target.dataset.commentid;
+        const commentContainer = document.getElementById(`comment-${commentID}`);
+        const commentContent = document.getElementById(`comment-content-${commentID}`).textContent;
+        commentContainer.innerHTML += `
+          <form class="edit-comment-form" id="edit-comment-form-${commentID}">
+            <textarea name="content" cols="60" rows="5">${commentContent}</textarea><br>
+            <input type="submit" value="Confirm">
+          </form>`;
+        const editCommentForm = document.getElementById(`edit-comment-form-${commentID}`);
+        editCommentForm.addEventListener("submit", e => {
+          e.preventDefault();
+          const formData = new FormData(editCommentForm);
+          fetch(`/api/edit-comment/${commentID}`, {
+            method: "POST",
+            body: formData
+          })
+            .then(resp => {
+              if(!resp.ok){
+                throw new Error(resp.statusText);
+              } else {
+                return resp.json();
+              }
+            })
+            .then(data => {
+              console.log(data);
+              // Skulle vara bra om man kunde ladda om kommentaren här så att förändringen syns.
+              editCommentForm.innerHTML += "<p>" + data.message + "</p>";
+            })
+            .catch(err => console.log(err));
+        })
+      })
+    });
   }
 };
 

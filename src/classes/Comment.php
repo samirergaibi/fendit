@@ -24,14 +24,13 @@ class Comment extends Connect{
         ]);
     }
 
-    public function editComment($content,$commentID){
+    public function editComment($content, $commentID){
         $statement = $this->db->prepare("UPDATE comments SET content = :content WHERE commentID = :commentID");
         
         $statement->execute([
             ':content' => $content,
             ':commentID' => $commentID
         ]);
-
     }
     
     public function deleteComment($commentID){

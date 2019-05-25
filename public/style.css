@@ -79,6 +79,9 @@ nav a{
   font-size: 0.8em;
   margin: 0 10px 0 0 ;
 }
+.edit-comment-form{
+  margin: 10px 0;
+}
 .highlight-author{
   font-size:20px;
   font-weight:bold;
