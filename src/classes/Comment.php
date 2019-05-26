@@ -34,10 +34,10 @@ class Comment extends Connect{
     }
     
     public function deleteComment($commentID){
-        $statement=  $this->db->prepare("DELETE from comments WHERE commentID = :commentID");
+        $statement = $this->db->prepare("DELETE FROM comments WHERE commentID = :commentID");
         $statement->execute([
             ':commentID' => $commentID
-            ]);
+        ]);
     }
 
 }

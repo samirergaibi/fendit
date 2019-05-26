@@ -168,6 +168,7 @@ const viewFetches = {
         if (loggedIn) {
           userEventListeners.createComment();
           userEventListeners.editComment();
+          userEventListeners.deleteComment();
         }
       })
       .catch(err => console.log(err));
@@ -343,7 +344,8 @@ const userEventListeners = {
       })
       .then(data => {
           console.log(data);
-          showCorrectView('entry', entryID)})
+          showCorrectView('entry', entryID);
+      })
       .catch(err =>console.log(err));
     })
   },
@@ -383,6 +385,31 @@ const userEventListeners = {
         })
       })
     });
+  },
+  deleteComment: function(){
+    const deleteBtns = document.querySelectorAll(".delete-comment-btn");
+    deleteBtns.forEach(deleteBtn => {
+      deleteBtn.addEventListener("click", e => {
+        const commentID = e.target.dataset.commentid;
+        const commentContainer = document.getElementById(`comment-${commentID}`);
+
+        fetch(`/api/comment/${commentID}`, {
+          method: "DELETE"
+        })
+          .then(resp => {
+            if (!resp.ok) {
+              throw new Error(resp.statusText);
+            } else {
+              return resp.json();
+            }
+          })
+          .then(data => {
+            console.log(data.message);
+            commentContainer.innerHTML += "<p>" + data.message + "</p>";
+          })
+          .catch(err => console.log(err));
+      })
+    })
   }
 };
 
