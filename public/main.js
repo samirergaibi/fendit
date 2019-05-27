@@ -148,8 +148,10 @@ const viewFetches = {
         commentContainer = document.getElementById('comment-container');
         let editBtn;
         let deleteBtn;
-        data.forEach(comment => {
-          if (loggedIn) {
+        const currentUser = data["currentUser"];
+        data["data"].forEach(comment => {
+          console.log(comment);
+          if (loggedIn && currentUser === comment.createdBy) {
             editBtn = `<button data-commentid="${comment.commentID}" class="edit-comment-btn">Edit</button>`;
             deleteBtn = `<button data-commentid="${comment.commentID}" class="delete-comment-btn">Delete</button>`;
           } else {
