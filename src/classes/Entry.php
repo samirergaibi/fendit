@@ -75,6 +75,15 @@
             ]);
             return $getLikes->fetch(PDO::FETCH_ASSOC);
         }
+
+        public function search($searchQuery){
+            $searchQuery = '%' . $searchQuery . '%';
+            $statement = $this->db->prepare("SELECT DISTINCT * FROM entries INNER JOIN users ON entries.createdBy = users.userID WHERE entries.content LIKE :searchQuery OR entries.title LIKE :searchQuery");
+            $statement->bindparam(':searchQuery', $searchQuery, PDO::PARAM_STR);
+            $statement->execute();
+            return $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        }
     }
 
 
