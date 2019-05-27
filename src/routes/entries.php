@@ -53,11 +53,16 @@
            $entry = new Entry($this->db);
            $entryID = $args['entryID'];
            $data = $req->getParsedBody();
-           $entry->updateEntry($data['title'], $data['content'], $entryID);
+        //    $entry->updateEntry($data['title'], $data['content'], $entryID);
            
-           return $resp->withJson([
-               "message" => "Edit successful"
-           ]);
+           return $resp->withJson($entry->updateEntry($data["title"], $data["content"], $entryID));
+         });
+
+         $app->get("/api/like/{entryID}", function($req, $resp, $args){
+            $entry =  new Entry($this->db);
+            $entryID = $args["entryID"];
+
+            return $resp->withJson($entry->registerLike($entryID));
          });
 
          $app->get('/api/search/{searchQuery}', function($req, $resp, $args){

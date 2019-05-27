@@ -26,11 +26,16 @@ class Comment extends Connect{
 
     public function editComment($content, $commentID){
         $statement = $this->db->prepare("UPDATE comments SET content = :content WHERE commentID = :commentID");
-        
         $statement->execute([
             ':content' => $content,
             ':commentID' => $commentID
         ]);
+
+        $getComment = $this->db->prepare("SELECT * FROM comments WHERE commentID = :commentID");
+        $getComment->execute([
+            ":commentID" => $commentID
+        ]);
+        return $getComment->fetch(PDO::FETCH_ASSOC);
     }
     
     public function deleteComment($commentID){

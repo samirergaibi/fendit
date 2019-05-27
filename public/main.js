@@ -17,55 +17,35 @@ const viewFetches = {
         const entryContainer = document.getElementById("entry-container");
         const loggedInNav = document.getElementById("logged-in-nav");
         const loggedOutNav = document.getElementById("logged-out-nav");
+        let btn;
+        let amountLikes;
         data.forEach(entry => {
           if (loggedIn) {
-            btn = `<button  data-entryID='${entry.entryID}'>Comment</button>`;
+            btn = `<button data-entryID='${entry.entryID}' class="like-btn">Like</button>`;
             loggedInNav.style.display = "flex";
             loggedOutNav.style.display = "none";
           } else {
-            btn = "";
+            btn = `<button data-entryID='${entry.entryID}' disabled>Like</button>`;
             loggedOutNav.style.display = "flex";
             loggedInNav.style.display = "none";
           }
+          if(entry.likes === null){
+            entry.likes = 0;
+          }
+          amountLikes = `<span class="likes">${entry.likes}</span>`;
           entryContainer.innerHTML +=`
-          <div class="entry">
+          <div class="entry" id="entry-${entry.entryID}">
             <h3>${entry.title}</h3>
             <p>Written by: <span class="highlight-author">${entry.username}</span></p>
             <p>Posted: ${entry.createdAt}</p>
             <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
             ${btn}
+            ${amountLikes}
           </div>`;
         })
-        //load more entries
-        const loadBtn = document.getElementById('load-btn');
-        loadBtn.addEventListener('click', function () {
-          fetch("api/allentries")
-            .then(resp=> resp.json())
-            .then(data => {
-              loadBtn.style.display = 'none';
-              data.forEach(entry => {
-                if (loggedIn) {
-                  btn = `<button  data-entryID='${entry.entryID}'>Comment</button>`;
-                  loggedInNav.style.display = "flex";
-                  loggedOutNav.style.display = "none";
-                } else {
-                  btn = "";
-                  loggedOutNav.style.display = "flex";
-                  loggedInNav.style.display = "none";
-                }
-                entryContainer.innerHTML +=`
-                <div class="entry">
-                  <h3>${entry.title}</h3>
-                  <p>Written by: <span class="highlight-author">${entry.username}</span></p>
-                  <p>Posted: ${entry.createdAt}</p>
-                  <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
-                  ${btn}
-                </div>`;
-              })  
-              userEventListeners.goToFullEntry();
-            })
-          })
-          userEventListeners.goToFullEntry();
+        userEventListeners.loadMoreEntries(loggedIn);
+        userEventListeners.goToFullEntry();
+        userEventListeners.likeComment();
     })
       .catch(err => console.log(err));
   },
@@ -98,12 +78,10 @@ const viewFetches = {
         return resp.json();
       }
     }).then(data => {
-      console.log(data);
       if (data.loggedIn) {
         renderView(views.home);
         viewFetches.home(data.loggedIn);
       } else {
-        renderView(views.login);
         const errorMsg = document.getElementById("error-msg");
         errorMsg.innerText = data.message;
       }
@@ -151,7 +129,6 @@ const viewFetches = {
         let deleteBtn;
         const currentUser = data["currentUser"];
         data["data"].forEach(comment => {
-          console.log(comment);
           if (loggedIn && currentUser === comment.createdBy) {
             editBtn = `<button data-commentid="${comment.commentID}" class="edit-comment-btn">Edit</button>`;
             deleteBtn = `<button data-commentid="${comment.commentID}" class="delete-comment-btn">Delete</button>`;
@@ -231,6 +208,42 @@ const userEventListeners = {
       })
     })
   },
+  loadMoreEntries: function(loggedIn){
+    const loadBtn = document.getElementById('load-btn');
+    const entryContainer = document.getElementById("entry-container");
+    loadBtn.addEventListener('click', function () {
+      fetch("/api/allentries")
+        .then(resp=> resp.json())
+        .then(data => {
+          loadBtn.style.display = 'none';
+          let btn;
+          let amountLikes;
+          data.forEach(entry => {
+            if (loggedIn) {
+              btn = `<button data-entryID='${entry.entryID}' class="like-btn">Like</button>`;
+            } else {
+              btn = `<button data-entryID='${entry.entryID}' disabled>Like</button>`;
+            }
+            if(entry.likes === null){
+              entry.likes = 0;
+            }
+            amountLikes = `<span class="likes">${entry.likes}</span>`;
+            entryContainer.innerHTML +=`
+            <div class="entry" id="entry-${entry.entryID}">
+              <h3>${entry.title}</h3>
+              <p>Written by: <span class="highlight-author">${entry.username}</span></p>
+              <p>Posted: ${entry.createdAt}</p>
+              <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
+              ${btn}
+              ${amountLikes}
+            </div>`;
+          })  
+          userEventListeners.goToFullEntry();
+          userEventListeners.likeComment();
+        })
+        .catch(err => console.log(err));
+    });
+  },
   createEntry: function(){
     const createEntryForm = document.getElementById("create-entry-form");
     createEntryForm.addEventListener("submit", e => {
@@ -263,16 +276,37 @@ const userEventListeners = {
       entryBtn.addEventListener("click", e => {
         const entryID = e.target.dataset.entryid;
         const entryContainer = document.querySelector(`#entry-${entryID}`);
-        const entryTitle = document.querySelector(`#entry-title-${entryID}`).innerText;
-        const entryContent = document.querySelector(`#entry-content-${entryID}`).innerText;
-        entryContainer.innerHTML += `
-          <form id="edit-entry-form-${entryID}">
-            <label for="title">Title</label>
-            <input type="text" name="title" id="title" autocomplete="off" value="${entryTitle}">
-            <label for="content">Content</label>
-            <textarea name="content" id="content" cols="60" rows="10">${entryContent}</textarea>
-            <input type="submit" value="Confirm">
-          </form>`;
+        const entryTitle = document.querySelector(`#entry-title-${entryID}`);
+        const entryContent = document.querySelector(`#entry-content-${entryID}`);
+
+        const findForm = document.getElementById(`edit-entry-form-${entryID}`);
+        if(!findForm){      
+          const form = document.createElement("form");
+          form.setAttribute("id", `edit-entry-form-${entryID}`);
+          const titleTextArea = document.createElement("textarea");
+          titleTextArea.setAttribute("name", "title");
+          titleTextArea.setAttribute("id", "title");
+          titleTextArea.setAttribute("cols", "60");
+          titleTextArea.setAttribute("rows", "1");
+          titleTextArea.textContent = `${entryTitle.innerText}`;
+          const contentTextArea = document.createElement("textarea");
+          contentTextArea.setAttribute("name", "content");
+          contentTextArea.setAttribute("id", "content");
+          contentTextArea.setAttribute("cols", "60");
+          contentTextArea.setAttribute("rows", "10");
+          contentTextArea.textContent = `${entryContent.innerText}`;
+          const formBtn = document.createElement("input");
+          formBtn.setAttribute("type", "submit");
+          formBtn.setAttribute("value", "confirm");
+          const breakElement = document.createElement("br");
+          
+          form.append(titleTextArea, breakElement, contentTextArea, formBtn);
+          entryContainer.append(form);
+        } else{
+          const editEntryForm = document.getElementById(`edit-entry-form-${entryID}`);
+          editEntryForm.style.display = "block";
+        }
+
         const editEntryForm = document.getElementById(`edit-entry-form-${entryID}`);
         editEntryForm.addEventListener("submit", e => {
           e.preventDefault();
@@ -290,10 +324,9 @@ const userEventListeners = {
               }
             })
             .then(data => {
-              renderView(views.userEntries);
-              viewFetches.userEntries();
-              // Vill helst stanna där man är på sidan men ändå uppdatera den.. Men man hamnar alltid längst upp
-              // Man kanske kan göra en fetch enbart på titlen och content?? Så att inte hela templaten laddas om
+              entryContent.textContent = data.content;
+              entryTitle.textContent = data.title;
+              editEntryForm.style.display = "none";
             })
             .catch(err => console.log(err));
         })
@@ -346,7 +379,6 @@ const userEventListeners = {
         }
       })
       .then(data => {
-          console.log(data);
           showCorrectView('entry', entryID);
       })
       .catch(err =>console.log(err));
@@ -358,10 +390,10 @@ const userEventListeners = {
       editBtn.addEventListener("click", e => {
         const commentID = e.target.dataset.commentid;
         const commentContainer = document.getElementById(`comment-${commentID}`);
-        const commentContent = document.getElementById(`comment-content-${commentID}`).textContent;
+        const commentContent = document.getElementById(`comment-content-${commentID}`);
         commentContainer.innerHTML += `
           <form class="edit-comment-form" id="edit-comment-form-${commentID}">
-            <textarea name="content" cols="60" rows="5">${commentContent}</textarea><br>
+            <textarea name="content" cols="60" rows="5">${commentContent.textContent}</textarea><br>
             <input type="submit" value="Confirm">
           </form>`;
         const editCommentForm = document.getElementById(`edit-comment-form-${commentID}`);
@@ -407,11 +439,30 @@ const userEventListeners = {
             }
           })
           .then(data => {
-            console.log(data.message);
             commentContainer.innerHTML += "<p>" + data.message + "</p>";
           })
           .catch(err => console.log(err));
       })
+    })
+  },
+  likeComment: function(){
+    const likeBtns = document.querySelectorAll(".like-btn");
+    likeBtns.forEach(likeBtn => {
+      likeBtn.addEventListener("click", e => {
+        const entryID = e.target.dataset.entryid;
+        fetch(`/api/like/${entryID}`)
+          .then(resp => {
+            if(!resp.ok){
+              throw new Error(resp.statusText);
+            }else{
+              return resp.json();
+            }
+          })
+          .then(data => {
+            likeBtn.parentNode.querySelector('.likes').textContent = data.likes;
+          })
+          .catch(err => console.log(err));
+      });
     })
   }
 };
@@ -432,22 +483,19 @@ function showCorrectView(view, entryID) {
   fetch("/api/ping")
     .then(resp => {
       if (!resp.ok) {
-        throw new Error("Not doing much, just throwing an error.");
+        throw new Error(resp.statusText);
       } else {
         return resp.json();
       }
     })
     .then(data => {
       if (data.loggedIn === true) {
-        console.log("You are logged in!");
         renderView(views[view]);
         viewFetches[view](true, entryID);
-      } else {
-        console.log("You are not supposed to end up here.. You are not logged in however");
       }
     })
     .catch(err => {
-      console.log("You are not logged in");
+      console.log(err);
       renderView(views[view]);
       viewFetches[view](false, entryID);
     });
@@ -481,7 +529,6 @@ menuItems.forEach(menuItem => {
         viewFetches.login(formData);
       });
     } else if (viewName === "logout") {
-      console.log("LOGOUT");
       fetch("/api/logout");
       viewFetches.home();
     } else if (viewName === "userEntries"){

@@ -35,11 +35,8 @@ return function($app){
         $data = $req->getParsedBody();
         $commentID = $args["commentID"];
         $comment = new Comment($this->db);
-        $comment->editComment($data['content'], $commentID);
 
-        return $resp->withJson([
-            "message" => 'Edit was successful.'
-        ]);
+        return $resp->withJson($comment->editComment($data["content"], $commentID));
     });
 
     $app->delete('/api/comment/{commentID}', function($req, $resp, $args){
