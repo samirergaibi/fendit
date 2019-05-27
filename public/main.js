@@ -503,7 +503,49 @@ const userEventListeners = {
           .catch(err => console.log(err));
       });
     })
-  }
+  },
+  searchEntry : function(){
+    const searchField = document.getElementById('search');
+    searchField.addEventListener('blur', function(){
+    fetch(`/api/search/${searchField.value}`)
+      .then(resp =>  resp.json())
+      .then(data=> {   
+        if (!searchField.value.match(/^[a-zA-Z]+$/)) 
+        {
+          searchField.style.border = '2px solid red'
+          searchField.value = "";
+          console.log("prutt")
+          return false;
+        }
+        else{
+          renderView(views.search);
+          let btn;
+          let amountLikes;
+          data.forEach(entry=>{
+            console.log(data);
+              btn = `<button data-entryID='${entry.entryID}' class="like-btn">Like</button>`;
+            if(entry.likes === null){
+              entry.likes = 0;
+            }
+            amountLikes = `<span class="likes">${entry.likes}</span>`
+            const searchContainer = document.getElementById("search-container");
+            searchField.style.border = '2px solid green'
+          searchContainer.innerHTML +=`
+            <div class="entry">
+              <h3>${entry.title}</h3>
+              <p>Written by: <span class="highlight-author">${entry.username}</span></p>
+              <p>Posted: ${entry.createdAt}</p>
+              <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
+              ${btn}
+             ${amountLikes}
+             </div>`;
+        })
+        userEventListeners.likeComment();
+      }
+      })
+    })
+    
+ }
 };
 
 function renderView(view) {
@@ -580,38 +622,5 @@ menuItems.forEach(menuItem => {
   });
 });
 
-const searchField = document.getElementById('search');
-searchField.addEventListener('blur', function(){
-fetch(`/api/search/${searchField.value}`)
-  .then(resp =>  resp.json())
-  .then(data=> {
-    console.log(data)
-    if (!searchField.value.match(/^[a-zA-Z]+$/)) 
-    {
-      searchField.style.border = '2px solid red'
-      searchField.value = "";
-      console.log("prutt")
-      return false;
-    }
-    else{
-      renderView(views.search);
-      data.forEach(entry=>{
-        const searchContainer = document.getElementById("search-container");
-        searchField.style.border = '2px solid green'
 
-      searchContainer.innerHTML +=`
-          <div class="entry">
-            <h3>${entry.title}</h3>
-            <p>Written by: <span class="highlight-author">${entry.username}</span></p>
-            <p>Posted: ${entry.createdAt}</p>
-            <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
-            ${btn}
-          </div>`;
-    })
-    userEventListeners.goToFullEntry();
-  }
-  })
-})
-
-
-
+userEventListeners.searchEntry();
