@@ -55,19 +55,13 @@ const viewFetches = {
       .then(resp=> resp.json())
       .then(data=>{
         const trendingContainer = document.getElementById('trending-container');
-        const loggedInNav = document.getElementById("logged-in-nav");
-        const loggedOutNav = document.getElementById("logged-out-nav");
         let btn;
         let amountLikes;
         data.forEach(entry => {
           if (loggedIn) {
             btn = `<button data-entryID='${entry.entryID}' class="like-btn">Like</button>`;
-            loggedInNav.style.display = "flex";
-            loggedOutNav.style.display = "none";
           } else {
             btn = `<button data-entryID='${entry.entryID}' disabled>Like</button>`;
-            loggedOutNav.style.display = "flex";
-            loggedInNav.style.display = "none";
           }
           if(entry.likes === null){
             entry.likes = 0;
@@ -83,10 +77,10 @@ const viewFetches = {
             ${amountLikes}
           </div>`;
         })
-
         userEventListeners.goToFullEntry();
         userEventListeners.likeComment();
       })
+      .catch(err => console.log(err));
   },
   register: function (formData, registerMsg) {
     fetch("/api/register", {
@@ -345,7 +339,6 @@ const userEventListeners = {
           const editEntryForm = document.getElementById(`edit-entry-form-${entryID}`);
           editEntryForm.style.display = "block";
         }
-
         const editEntryForm = document.getElementById(`edit-entry-form-${entryID}`);
         editEntryForm.addEventListener("submit", e => {
           e.preventDefault();
@@ -430,11 +423,28 @@ const userEventListeners = {
         const commentID = e.target.dataset.commentid;
         const commentContainer = document.getElementById(`comment-${commentID}`);
         const commentContent = document.getElementById(`comment-content-${commentID}`);
-        commentContainer.innerHTML += `
-          <form class="edit-comment-form" id="edit-comment-form-${commentID}">
-            <textarea name="content" cols="60" rows="5">${commentContent.textContent}</textarea><br>
-            <input type="submit" value="Confirm">
-          </form>`;
+        
+        const findForm = document.getElementById(`edit-comment-form-${commentID}`);
+        if(!findForm){
+          const form = document.createElement("form");
+          form.setAttribute("class", `edit-comment-form`);
+          form.setAttribute("id", `edit-comment-form-${commentID}`);
+          const textArea = document.createElement("textarea");
+          textArea.setAttribute("name", "content");
+          textArea.setAttribute("cols", "60");
+          textArea.setAttribute("rows", "5");
+          textArea.textContent = `${commentContent.textContent}`;
+          const btn = document.createElement("input");
+          btn.setAttribute("type", "submit");
+          btn.setAttribute("value", "Confirm");
+          const breakElement = document.createElement("br");
+
+          form.append(textArea, breakElement, btn);
+          commentContainer.append(form);
+        } else{
+          const editCommentForm = document.getElementById(`edit-comment-form-${commentID}`);
+          editCommentForm.style.display = "block";
+        }
         const editCommentForm = document.getElementById(`edit-comment-form-${commentID}`);
         editCommentForm.addEventListener("submit", e => {
           e.preventDefault();
@@ -451,9 +461,9 @@ const userEventListeners = {
               }
             })
             .then(data => {
-              console.log(data);
-              // Skulle vara bra om man kunde ladda om kommentaren här så att förändringen syns.
-              editCommentForm.innerHTML += "<p>" + data.message + "</p>";
+              const comment = document.querySelector(`#comment-content-${commentID}`);
+              comment.textContent = data.content;
+              editCommentForm.style.display = "none";
             })
             .catch(err => console.log(err));
         })
@@ -466,21 +476,23 @@ const userEventListeners = {
       deleteBtn.addEventListener("click", e => {
         const commentID = e.target.dataset.commentid;
         const commentContainer = document.getElementById(`comment-${commentID}`);
-
-        fetch(`/api/comment/${commentID}`, {
-          method: "DELETE"
-        })
-          .then(resp => {
-            if (!resp.ok) {
-              throw new Error(resp.statusText);
-            } else {
-              return resp.json();
-            }
+        let confirmation = confirm("Are you sure that you want to delete this comment?");
+        if(confirmation){
+          fetch(`/api/comment/${commentID}`, {
+            method: "DELETE"
           })
-          .then(data => {
-            commentContainer.innerHTML += "<p>" + data.message + "</p>";
-          })
-          .catch(err => console.log(err));
+            .then(resp => {
+              if (!resp.ok) {
+                throw new Error(resp.statusText);
+              } else {
+                return resp.json();
+              }
+            })
+            .then(data => {
+              commentContainer.style.display = "none";
+            })
+            .catch(err => console.log(err));
+        }
       })
     })
   },
@@ -505,46 +517,51 @@ const userEventListeners = {
     })
   },
   searchEntry : function(){
-    const searchField = document.getElementById('search');
-    searchField.addEventListener('blur', function(){
-    fetch(`/api/search/${searchField.value}`)
+    const searchFields = document.querySelectorAll(".search");
+    searchFields.forEach(searchField => {
+      searchField.addEventListener("blur", () => {
+        fetch(`/api/search/${searchField.value}`)
       .then(resp =>  resp.json())
-      .then(data=> {   
-        if (!searchField.value.match(/^[a-zA-Z]+$/)) 
-        {
-          searchField.style.border = '2px solid red'
+      .then(data => {
+        if(!searchField.value.match(/^[a-zA-Z]+$/)) {
+          searchField.style.border = '2px solid red';
           searchField.value = "";
-          console.log("prutt")
           return false;
         }
         else{
           renderView(views.search);
           let btn;
           let amountLikes;
-          data.forEach(entry=>{
-            console.log(data);
+          data.data.forEach(entry => {
+            if(data.loggedIn){
               btn = `<button data-entryID='${entry.entryID}' class="like-btn">Like</button>`;
+            }
+            else{
+              btn = `<button data-entryID='${entry.entryID}' disabled>Like</button>`;
+            }
             if(entry.likes === null){
               entry.likes = 0;
             }
             amountLikes = `<span class="likes">${entry.likes}</span>`
             const searchContainer = document.getElementById("search-container");
-            searchField.style.border = '2px solid green'
-          searchContainer.innerHTML +=`
+            searchField.value = "";
+            searchContainer.innerHTML +=`
             <div class="entry">
               <h3>${entry.title}</h3>
               <p>Written by: <span class="highlight-author">${entry.username}</span></p>
               <p>Posted: ${entry.createdAt}</p>
               <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
               ${btn}
-             ${amountLikes}
-             </div>`;
-        })
-        userEventListeners.likeComment();
-      }
+              ${amountLikes}
+            </div>`;
+          });
+          userEventListeners.likeComment();
+          userEventListeners.goToFullEntry();
+        }
       })
-    })
-    
+      .catch(err => console.log(err));
+      });
+    });
  }
 };
 
@@ -621,6 +638,4 @@ menuItems.forEach(menuItem => {
     }
   });
 });
-
-
 userEventListeners.searchEntry();
