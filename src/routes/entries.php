@@ -70,6 +70,10 @@
             $searchQuery = $args['searchQuery'];
             return $resp->withJson($entry->search($searchQuery));
          });
+         $app->get('/api/trending', function($req, $resp){
+             $entry = new Entry($this->db);
+             return $resp->withJson($entry->trending());
+         });
 
     }
 
