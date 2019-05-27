@@ -55,6 +55,12 @@
                 ":content" => $content,
                 ":entryID" => $entryID
             ]);
+
+            $getNewEntry = $this->db->prepare("SELECT * FROM entries WHERE entryID = :entryID");
+            $getNewEntry->execute([
+                ":entryID" => $entryID
+            ]);
+            return $getNewEntry->fetch(PDO::FETCH_ASSOC);
         }
 
         public function registerLike($entryID){
@@ -62,6 +68,12 @@
             $statement->execute([
                 ":entryID" => $entryID
             ]);
+
+            $getLikes = $this->db->prepare("SELECT likes FROM entries WHERE entryID = :entryID");
+            $getLikes->execute([
+                ":entryID" => $entryID
+            ]);
+            return $getLikes->fetch(PDO::FETCH_ASSOC);
         }
     }
 

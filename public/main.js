@@ -31,7 +31,7 @@ const viewFetches = {
           if(entry.likes === null){
             entry.likes = 0;
           }
-          amountLikes = `<span>${entry.likes}</span>`;
+          amountLikes = `<span class="likes">${entry.likes}</span>`;
           entryContainer.innerHTML +=`
           <div class="entry" id="entry-${entry.entryID}">
             <h3>${entry.title}</h3>
@@ -81,7 +81,6 @@ const viewFetches = {
         renderView(views.home);
         viewFetches.home(data.loggedIn);
       } else {
-        renderView(views.login);
         const errorMsg = document.getElementById("error-msg");
         errorMsg.innerText = data.message;
       }
@@ -227,7 +226,7 @@ const userEventListeners = {
             if(entry.likes === null){
               entry.likes = 0;
             }
-            amountLikes = `<span>${entry.likes}</span>`;
+            amountLikes = `<span class="likes">${entry.likes}</span>`;
             entryContainer.innerHTML +=`
             <div class="entry" id="entry-${entry.entryID}">
               <h3>${entry.title}</h3>
@@ -276,16 +275,37 @@ const userEventListeners = {
       entryBtn.addEventListener("click", e => {
         const entryID = e.target.dataset.entryid;
         const entryContainer = document.querySelector(`#entry-${entryID}`);
-        const entryTitle = document.querySelector(`#entry-title-${entryID}`).innerText;
-        const entryContent = document.querySelector(`#entry-content-${entryID}`).innerText;
-        entryContainer.innerHTML += `
-          <form id="edit-entry-form-${entryID}">
-            <label for="title">Title</label>
-            <input type="text" name="title" id="title" autocomplete="off" value="${entryTitle}">
-            <label for="content">Content</label>
-            <textarea name="content" id="content" cols="60" rows="10">${entryContent}</textarea>
-            <input type="submit" value="Confirm">
-          </form>`;
+        const entryTitle = document.querySelector(`#entry-title-${entryID}`);
+        const entryContent = document.querySelector(`#entry-content-${entryID}`);
+
+        const findForm = document.getElementById(`edit-entry-form-${entryID}`);
+        if(!findForm){      
+          const form = document.createElement("form");
+          form.setAttribute("id", `edit-entry-form-${entryID}`);
+          const titleTextArea = document.createElement("textarea");
+          titleTextArea.setAttribute("name", "title");
+          titleTextArea.setAttribute("id", "title");
+          titleTextArea.setAttribute("cols", "60");
+          titleTextArea.setAttribute("rows", "1");
+          titleTextArea.textContent = `${entryTitle.innerText}`;
+          const contentTextArea = document.createElement("textarea");
+          contentTextArea.setAttribute("name", "content");
+          contentTextArea.setAttribute("id", "content");
+          contentTextArea.setAttribute("cols", "60");
+          contentTextArea.setAttribute("rows", "10");
+          contentTextArea.textContent = `${entryContent.innerText}`;
+          const formBtn = document.createElement("input");
+          formBtn.setAttribute("type", "submit");
+          formBtn.setAttribute("value", "confirm");
+          const breakElement = document.createElement("br");
+          
+          form.append(titleTextArea, breakElement, contentTextArea, formBtn);
+          entryContainer.append(form);
+        } else{
+          const editEntryForm = document.getElementById(`edit-entry-form-${entryID}`);
+          editEntryForm.style.display = "block";
+        }
+
         const editEntryForm = document.getElementById(`edit-entry-form-${entryID}`);
         editEntryForm.addEventListener("submit", e => {
           e.preventDefault();
@@ -303,10 +323,9 @@ const userEventListeners = {
               }
             })
             .then(data => {
-              renderView(views.userEntries);
-              viewFetches.userEntries();
-              // Vill helst stanna där man är på sidan men ändå uppdatera den.. Men man hamnar alltid längst upp
-              // Man kanske kan göra en fetch enbart på titlen och content?? Så att inte hela templaten laddas om
+              entryContent.textContent = data.content;
+              entryTitle.textContent = data.title;
+              editEntryForm.style.display = "none";
             })
             .catch(err => console.log(err));
         })
@@ -370,10 +389,10 @@ const userEventListeners = {
       editBtn.addEventListener("click", e => {
         const commentID = e.target.dataset.commentid;
         const commentContainer = document.getElementById(`comment-${commentID}`);
-        const commentContent = document.getElementById(`comment-content-${commentID}`).textContent;
+        const commentContent = document.getElementById(`comment-content-${commentID}`);
         commentContainer.innerHTML += `
           <form class="edit-comment-form" id="edit-comment-form-${commentID}">
-            <textarea name="content" cols="60" rows="5">${commentContent}</textarea><br>
+            <textarea name="content" cols="60" rows="5">${commentContent.textContent}</textarea><br>
             <input type="submit" value="Confirm">
           </form>`;
         const editCommentForm = document.getElementById(`edit-comment-form-${commentID}`);
@@ -429,7 +448,6 @@ const userEventListeners = {
     const likeBtns = document.querySelectorAll(".like-btn");
     likeBtns.forEach(likeBtn => {
       likeBtn.addEventListener("click", e => {
-        console.log("clicked!");
         const entryID = e.target.dataset.entryid;
         fetch(`/api/like/${entryID}`)
           .then(resp => {
@@ -440,8 +458,7 @@ const userEventListeners = {
             }
           })
           .then(data => {
-            const entryContainer = document.getElementById(`entry-${entryID}`);
-            entryContainer.innerHTML += `<p>${data.message}</p>`;
+            likeBtn.parentNode.querySelector('.likes').textContent = data.likes;
           })
           .catch(err => console.log(err));
       });
