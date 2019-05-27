@@ -56,6 +56,13 @@
                 ":entryID" => $entryID
             ]);
         }
+
+        public function registerLike($entryID){
+            $statement = $this->db->prepare("UPDATE entries SET likes = COALESCE(likes, 0) + 1 WHERE entryID = :entryID");
+            $statement->execute([
+                ":entryID" => $entryID
+            ]);
+        }
     }
 
 

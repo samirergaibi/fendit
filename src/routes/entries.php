@@ -60,6 +60,16 @@
            ]);
          });
 
+         $app->get("/api/like/{entryID}", function($req, $resp, $args){
+            $entry =  new Entry($this->db);
+            $entryID = $args["entryID"];
+            $entry->registerLike($entryID);
+
+            return $resp->withJson([
+                "message" => "You liked!"
+            ]);
+         });
+
     }
 
 

@@ -16,55 +16,35 @@ const viewFetches = {
         const entryContainer = document.getElementById("entry-container");
         const loggedInNav = document.getElementById("logged-in-nav");
         const loggedOutNav = document.getElementById("logged-out-nav");
+        let btn;
+        let amountLikes;
         data.forEach(entry => {
           if (loggedIn) {
-            btn = `<button  data-entryID='${entry.entryID}'>Comment</button>`;
+            btn = `<button data-entryID='${entry.entryID}' class="like-btn">Like</button>`;
             loggedInNav.style.display = "flex";
             loggedOutNav.style.display = "none";
           } else {
-            btn = "";
+            btn = `<button data-entryID='${entry.entryID}' disabled>Like</button>`;
             loggedOutNav.style.display = "flex";
             loggedInNav.style.display = "none";
           }
+          if(entry.likes === null){
+            entry.likes = 0;
+          }
+          amountLikes = `<span>${entry.likes}</span>`;
           entryContainer.innerHTML +=`
-          <div class="entry">
+          <div class="entry" id="entry-${entry.entryID}">
             <h3>${entry.title}</h3>
             <p>Written by: <span class="highlight-author">${entry.username}</span></p>
             <p>Posted: ${entry.createdAt}</p>
             <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
             ${btn}
+            ${amountLikes}
           </div>`;
         })
-        //load more entries
-        const loadBtn = document.getElementById('load-btn');
-        loadBtn.addEventListener('click', function () {
-          fetch("api/allentries")
-            .then(resp=> resp.json())
-            .then(data => {
-              loadBtn.style.display = 'none';
-              data.forEach(entry => {
-                if (loggedIn) {
-                  btn = `<button  data-entryID='${entry.entryID}'>Comment</button>`;
-                  loggedInNav.style.display = "flex";
-                  loggedOutNav.style.display = "none";
-                } else {
-                  btn = "";
-                  loggedOutNav.style.display = "flex";
-                  loggedInNav.style.display = "none";
-                }
-                entryContainer.innerHTML +=`
-                <div class="entry">
-                  <h3>${entry.title}</h3>
-                  <p>Written by: <span class="highlight-author">${entry.username}</span></p>
-                  <p>Posted: ${entry.createdAt}</p>
-                  <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
-                  ${btn}
-                </div>`;
-              })  
-              userEventListeners.goToFullEntry();
-            })
-          })
-          userEventListeners.goToFullEntry();
+        userEventListeners.loadMoreEntries(loggedIn);
+        userEventListeners.goToFullEntry();
+        userEventListeners.likeComment();
     })
       .catch(err => console.log(err));
   },
@@ -97,7 +77,6 @@ const viewFetches = {
         return resp.json();
       }
     }).then(data => {
-      console.log(data);
       if (data.loggedIn) {
         renderView(views.home);
         viewFetches.home(data.loggedIn);
@@ -150,7 +129,6 @@ const viewFetches = {
         let deleteBtn;
         const currentUser = data["currentUser"];
         data["data"].forEach(comment => {
-          console.log(comment);
           if (loggedIn && currentUser === comment.createdBy) {
             editBtn = `<button data-commentid="${comment.commentID}" class="edit-comment-btn">Edit</button>`;
             deleteBtn = `<button data-commentid="${comment.commentID}" class="delete-comment-btn">Delete</button>`;
@@ -229,6 +207,42 @@ const userEventListeners = {
         showCorrectView('entry', entryID)
       })
     })
+  },
+  loadMoreEntries: function(loggedIn){
+    const loadBtn = document.getElementById('load-btn');
+    const entryContainer = document.getElementById("entry-container");
+    loadBtn.addEventListener('click', function () {
+      fetch("/api/allentries")
+        .then(resp=> resp.json())
+        .then(data => {
+          loadBtn.style.display = 'none';
+          let btn;
+          let amountLikes;
+          data.forEach(entry => {
+            if (loggedIn) {
+              btn = `<button data-entryID='${entry.entryID}' class="like-btn">Like</button>`;
+            } else {
+              btn = `<button data-entryID='${entry.entryID}' disabled>Like</button>`;
+            }
+            if(entry.likes === null){
+              entry.likes = 0;
+            }
+            amountLikes = `<span>${entry.likes}</span>`;
+            entryContainer.innerHTML +=`
+            <div class="entry" id="entry-${entry.entryID}">
+              <h3>${entry.title}</h3>
+              <p>Written by: <span class="highlight-author">${entry.username}</span></p>
+              <p>Posted: ${entry.createdAt}</p>
+              <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
+              ${btn}
+              ${amountLikes}
+            </div>`;
+          })  
+          userEventListeners.goToFullEntry();
+          userEventListeners.likeComment();
+        })
+        .catch(err => console.log(err));
+    });
   },
   createEntry: function(){
     const createEntryForm = document.getElementById("create-entry-form");
@@ -345,7 +359,6 @@ const userEventListeners = {
         }
       })
       .then(data => {
-          console.log(data);
           showCorrectView('entry', entryID);
       })
       .catch(err =>console.log(err));
@@ -406,11 +419,32 @@ const userEventListeners = {
             }
           })
           .then(data => {
-            console.log(data.message);
             commentContainer.innerHTML += "<p>" + data.message + "</p>";
           })
           .catch(err => console.log(err));
       })
+    })
+  },
+  likeComment: function(){
+    const likeBtns = document.querySelectorAll(".like-btn");
+    likeBtns.forEach(likeBtn => {
+      likeBtn.addEventListener("click", e => {
+        console.log("clicked!");
+        const entryID = e.target.dataset.entryid;
+        fetch(`/api/like/${entryID}`)
+          .then(resp => {
+            if(!resp.ok){
+              throw new Error(resp.statusText);
+            }else{
+              return resp.json();
+            }
+          })
+          .then(data => {
+            const entryContainer = document.getElementById(`entry-${entryID}`);
+            entryContainer.innerHTML += `<p>${data.message}</p>`;
+          })
+          .catch(err => console.log(err));
+      });
     })
   }
 };
@@ -431,22 +465,19 @@ function showCorrectView(view, entryID) {
   fetch("/api/ping")
     .then(resp => {
       if (!resp.ok) {
-        throw new Error("Not doing much, just throwing an error.");
+        throw new Error(resp.statusText);
       } else {
         return resp.json();
       }
     })
     .then(data => {
       if (data.loggedIn === true) {
-        console.log("You are logged in!");
         renderView(views[view]);
         viewFetches[view](true, entryID);
-      } else {
-        console.log("You are not supposed to end up here.. You are not logged in however");
       }
     })
     .catch(err => {
-      console.log("You are not logged in");
+      console.log(err);
       renderView(views[view]);
       viewFetches[view](false, entryID);
     });
@@ -480,7 +511,6 @@ menuItems.forEach(menuItem => {
         viewFetches.login(formData);
       });
     } else if (viewName === "logout") {
-      console.log("LOGOUT");
       fetch("/api/logout");
       viewFetches.home();
     } else if (viewName === "userEntries"){
