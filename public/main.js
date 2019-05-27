@@ -575,7 +575,7 @@ menuItems.forEach(menuItem => {
     } else if (viewName === "users"){
       viewFetches.users();
     } else if (viewName === 'trending'){
-      showCorrectView('trending')
+      showCorrectView('trending');
     }
   });
 });
