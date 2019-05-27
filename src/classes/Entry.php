@@ -84,6 +84,11 @@
             return $statement->fetchAll(PDO::FETCH_ASSOC);
 
         }
+        public function trending(){
+            $statement= $this->db->prepare("SELECT * FROM entries INNER JOIN users ON entries.createdBy = users.userID where likes > 0 ORDER BY likes DESC");
+            $statement->execute();
+            return $statement->fetchAll(PDO::FETCH_ASSOC);
+        }
     }
 
 

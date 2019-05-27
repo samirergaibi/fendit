@@ -6,7 +6,8 @@ const views = {
   entry: ['#full-entry-template'],
   userEntries: ["#user-entries-template"],
   users: ["#users-template"],
-  search: ["#search-template"]
+  search: ["#search-template"],
+  trending: ["#trending-template"]
 };
 
 const viewFetches = {
@@ -48,6 +49,44 @@ const viewFetches = {
         userEventListeners.likeComment();
     })
       .catch(err => console.log(err));
+  },
+  trending: function(loggedIn = false){
+    fetch('/api/trending')
+      .then(resp=> resp.json())
+      .then(data=>{
+        const trendingContainer = document.getElementById('trending-container');
+        const loggedInNav = document.getElementById("logged-in-nav");
+        const loggedOutNav = document.getElementById("logged-out-nav");
+        let btn;
+        let amountLikes;
+        data.forEach(entry => {
+          if (loggedIn) {
+            btn = `<button data-entryID='${entry.entryID}' class="like-btn">Like</button>`;
+            loggedInNav.style.display = "flex";
+            loggedOutNav.style.display = "none";
+          } else {
+            btn = `<button data-entryID='${entry.entryID}' disabled>Like</button>`;
+            loggedOutNav.style.display = "flex";
+            loggedInNav.style.display = "none";
+          }
+          if(entry.likes === null){
+            entry.likes = 0;
+          }
+          amountLikes = `<span class="likes">${entry.likes}</span>`;
+          trendingContainer.innerHTML +=`
+          <div class="entry" id="entry-${entry.entryID}">
+            <h3>${entry.title}</h3>
+            <p>Written by: <span class="highlight-author">${entry.username}</span></p>
+            <p>Posted: ${entry.createdAt}</p>
+            <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
+            ${btn}
+            ${amountLikes}
+          </div>`;
+        })
+
+        userEventListeners.goToFullEntry();
+        userEventListeners.likeComment();
+      })
   },
   register: function (formData, registerMsg) {
     fetch("/api/register", {
@@ -535,6 +574,8 @@ menuItems.forEach(menuItem => {
       viewFetches.userEntries();
     } else if (viewName === "users"){
       viewFetches.users();
+    } else if (viewName === 'trending'){
+      viewFetches.trending();
     }
   });
 });
@@ -571,3 +612,6 @@ fetch(`/api/search/${searchField.value}`)
   }
   })
 })
+
+
+
