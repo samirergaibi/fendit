@@ -59,7 +59,7 @@
 
         public function search($searchQuery){
             $searchQuery = '%' . $searchQuery . '%';
-            $statement = $this->db->prepare("SELECT DISTINCT * FROM entries WHERE content LIKE :searchQuery OR title LIKE :searchQuery ");
+            $statement = $this->db->prepare("SELECT DISTINCT * FROM entries INNER JOIN users ON entries.createdBy = users.userID WHERE entries.content LIKE :searchQuery OR entries.title LIKE :searchQuery");
             $statement->bindparam(':searchQuery', $searchQuery, PDO::PARAM_STR);
             $statement->execute();
             return $statement->fetchAll(PDO::FETCH_ASSOC);

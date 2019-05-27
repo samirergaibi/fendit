@@ -497,6 +497,30 @@ searchField.addEventListener('blur', function(){
 fetch(`/api/search/${searchField.value}`)
   .then(resp =>  resp.json())
   .then(data=> {
-console.log(data)
+    console.log(data)
+    if (!searchField.value.match(/^[a-zA-Z]+$/)) 
+    {
+      searchField.style.border = '2px solid red'
+      searchField.value = "";
+      console.log("prutt")
+      return false;
+    }
+    else{
+      renderView(views.search);
+      data.forEach(entry=>{
+        const searchContainer = document.getElementById("search-container");
+        searchField.style.border = '2px solid green'
+
+      searchContainer.innerHTML +=`
+          <div class="entry">
+            <h3>${entry.title}</h3>
+            <p>Written by: <span class="highlight-author">${entry.username}</span></p>
+            <p>Posted: ${entry.createdAt}</p>
+            <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
+            ${btn}
+          </div>`;
+    })
+    userEventListeners.goToFullEntry();
+  }
   })
 })
