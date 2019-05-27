@@ -5,7 +5,8 @@ const views = {
   logout: ["#home-template"],
   entry: ['#full-entry-template'],
   userEntries: ["#user-entries-template"],
-  users: ["#users-template"]
+  users: ["#users-template"],
+  search: ["#search-template"]
 };
 
 const viewFetches = {
@@ -488,3 +489,12 @@ menuItems.forEach(menuItem => {
     }
   });
 });
+
+const searchField = document.getElementById('search');
+searchField.addEventListener('blur', function(){
+fetch(`/api/search/${searchField.value}`)
+  .then(resp =>  resp.json())
+  .then(data=> {
+console.log(data)
+  })
+})

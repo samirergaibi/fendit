@@ -56,6 +56,15 @@
                 ":entryID" => $entryID
             ]);
         }
+
+        public function search($searchQuery){
+            $searchQuery = '%' . $searchQuery . '%';
+            $statement = $this->db->prepare("SELECT DISTINCT * FROM entries WHERE content LIKE :searchQuery OR title LIKE :searchQuery ");
+            $statement->bindparam(':searchQuery', $searchQuery, PDO::PARAM_STR);
+            $statement->execute();
+            return $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        }
     }
 
 

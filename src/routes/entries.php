@@ -60,6 +60,12 @@
            ]);
          });
 
+         $app->get('/api/search/{searchQuery}', function($req, $resp, $args){
+            $entry = new Entry($this->db);
+            $searchQuery = $args['searchQuery'];
+            return $resp->withJson($entry->search($searchQuery));
+         });
+
     }
 
 
