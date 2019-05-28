@@ -607,6 +607,7 @@ const menuItems = document.querySelectorAll("nav a");
 menuItems.forEach(menuItem => {
   menuItem.addEventListener("click", function (e) {
     e.preventDefault();
+    loadCounter = 20;
 
     const viewName = e.target.dataset.template;
     renderView(views[viewName]);
