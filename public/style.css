@@ -184,4 +184,6 @@ transition: all 0.3s ease 0s;
 /* SAMIR JOBBA ÖVER */
 /* TOBBE JOBBA UNDER */
 
-
+.italic{
+  font-style: italic;
+}

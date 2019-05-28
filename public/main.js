@@ -38,7 +38,7 @@ const viewFetches = {
           <div class="entry" id="entry-${entry.entryID}">
             <h3>${entry.title}</h3>
             <p>Written by: <span class="highlight-author">${entry.username}</span></p>
-            <p>Posted: ${entry.createdAt}</p>
+            <p class="italic">Posted: ${entry.createdAt}</p>
             <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
             ${btn}
             ${amountLikes}
@@ -71,7 +71,7 @@ const viewFetches = {
           <div class="entry" id="entry-${entry.entryID}">
             <h3>${entry.title}</h3>
             <p>Written by: <span class="highlight-author">${entry.username}</span></p>
-            <p>Posted: ${entry.createdAt}</p>
+            <p class="italic">Posted: ${entry.createdAt}</p>
             <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
             ${btn}
             ${amountLikes}
@@ -139,8 +139,8 @@ const viewFetches = {
         entryContainer.innerHTML = `
         <h1>${data.title}</h1>
         <p>${data.content}<p>
-        <p>${data.username}<p>
-        <p>${data.createdAt}<p>
+        <p class="highlight-author">${data.username}<p>
+        <p class="italic">${data.createdAt}<p>
         <form id="comment-form">
         ${commentBox}<br>
         ${btn}
@@ -203,8 +203,8 @@ const viewFetches = {
           <div class="entry" id="entry-${entry.entryID}">
             <h2 id="entry-title-${entry.entryID}">${entry.title}</h2>
             <p id="entry-content-${entry.entryID}">${entry.content}</p>
-            <p>${entry.username}</p>
-            <p>${entry.createdAt}</p>
+            <p class="highlight-author">${entry.username}</p>
+            <p class="italic">${entry.createdAt}</p>
             <button data-entryid="${entry.entryID}" class="full-entry-btn">Full Entry</button>
             <button data-entryid="${entry.entryID}" class="edit-entry-btn">Edit</button>
             <button data-entryid="${entry.entryID}" class="delete-entry-btn">Remove</button>
@@ -264,7 +264,7 @@ const userEventListeners = {
             <div class="entry" id="entry-${entry.entryID}">
               <h3>${entry.title}</h3>
               <p>Written by: <span class="highlight-author">${entry.username}</span></p>
-              <p>Posted: ${entry.createdAt}</p>
+              <p class="italic">Posted: ${entry.createdAt}</p>
               <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
               ${btn}
               ${amountLikes}
@@ -333,7 +333,6 @@ const userEventListeners = {
           formBtn.setAttribute("value", "confirm");
           const breakElement = document.createElement("br");
           const breakElement2 = document.createElement("br");
-          
           form.append(titleTextArea, breakElement, contentTextArea,breakElement2,formBtn);
           entryContainer.append(form);
         } else{
@@ -551,7 +550,7 @@ const userEventListeners = {
               <div class="entry">
                 <h3>${entry.title}</h3>
                 <p>Written by: <span class="highlight-author">${entry.username}</span></p>
-                <p>Posted: ${entry.createdAt}</p>
+                <p class="italic">Posted: ${entry.createdAt}</p>
                 <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
                 ${btn}
                 ${amountLikes}
