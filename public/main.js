@@ -22,11 +22,11 @@ const viewFetches = {
         let amountLikes;
         data.forEach(entry => {
           if (loggedIn) {
-            btn = `<button data-entryID='${entry.entryID}' class="like-btn">Like</button>`;
+            btn = `<i data-entryID='${entry.entryID}' class=" far fa-thumbs-up like-btn"></i>`;
             loggedInNav.style.display = "flex";
             loggedOutNav.style.display = "none";
           } else {
-            btn = `<button data-entryID='${entry.entryID}' disabled>Like</button>`;
+            btn = `<i data-entryID='${entry.entryID}' class=" far fa-thumbs-up like-btn disable"></i>`;
             loggedOutNav.style.display = "flex";
             loggedInNav.style.display = "none";
           }
@@ -46,7 +46,7 @@ const viewFetches = {
         })
         userEventListeners.loadMoreEntries(loggedIn);
         userEventListeners.goToFullEntry();
-        userEventListeners.likeComment();
+        userEventListeners.likeEntry();
     })
       .catch(err => console.log(err));
   },
@@ -59,9 +59,9 @@ const viewFetches = {
         let amountLikes;
         data.forEach(entry => {
           if (loggedIn) {
-            btn = `<button data-entryID='${entry.entryID}' class="like-btn">Like</button>`;
+            btn = `<i data-entryID='${entry.entryID}' class=" far fa-thumbs-up like-btn"></i>`;
           } else {
-            btn = `<button data-entryID='${entry.entryID}' disabled>Like</button>`;
+            btn = `<i data-entryID='${entry.entryID}' class=" far fa-thumbs-up like-btn disable"></i>`;
           }
           if(entry.likes === null){
             entry.likes = 0;
@@ -78,7 +78,7 @@ const viewFetches = {
           </div>`;
         })
         userEventListeners.goToFullEntry();
-        userEventListeners.likeComment();
+        userEventListeners.likeEntry();
       })
       .catch(err => console.log(err));
   },
@@ -253,9 +253,9 @@ const userEventListeners = {
           let amountLikes;
           data.forEach(entry => {
             if (loggedIn) {
-              btn = `<button data-entryID='${entry.entryID}' class="like-btn">Like</button>`;
+              btn = `<i data-entryID='${entry.entryID}' class=" far fa-thumbs-up like-btn"></i>`;
             } else {
-              btn = `<button data-entryID='${entry.entryID}' disabled>Like</button>`;
+              btn = `<i data-entryID='${entry.entryID}' class=" far fa-thumbs-up like-btn disable"></i>`;
             }
             if(entry.likes === null){
               entry.likes = 0;
@@ -272,7 +272,7 @@ const userEventListeners = {
             </div>`;
           })  
           userEventListeners.goToFullEntry();
-          userEventListeners.likeComment();
+          userEventListeners.likeEntry();
         })
         .catch(err => console.log(err));
     });
@@ -496,7 +496,7 @@ const userEventListeners = {
       })
     })
   },
-  likeComment: function(){
+  likeEntry: function(){
     const likeBtns = document.querySelectorAll(".like-btn");
     likeBtns.forEach(likeBtn => {
       likeBtn.addEventListener("click", e => {
@@ -519,47 +519,49 @@ const userEventListeners = {
   searchEntry : function(){
     const searchFields = document.querySelectorAll(".search");
     searchFields.forEach(searchField => {
-      searchField.addEventListener("blur", () => {
-        fetch(`/api/search/${searchField.value}`)
-      .then(resp =>  resp.json())
-      .then(data => {
-        if(!searchField.value.match(/^[a-zA-Z]+$/)) {
-          searchField.style.border = '2px solid red';
-          searchField.value = "";
-          return false;
-        }
-        else{
-          renderView(views.search);
-          let btn;
-          let amountLikes;
-          data.data.forEach(entry => {
-            if(data.loggedIn){
-              btn = `<button data-entryID='${entry.entryID}' class="like-btn">Like</button>`;
-            }
-            else{
-              btn = `<button data-entryID='${entry.entryID}' disabled>Like</button>`;
-            }
-            if(entry.likes === null){
-              entry.likes = 0;
-            }
-            amountLikes = `<span class="likes">${entry.likes}</span>`
-            const searchContainer = document.getElementById("search-container");
+      searchField.addEventListener("keydown", e => {
+        if(e.code == "Enter"){
+          fetch(`/api/search/${searchField.value}`)
+        .then(resp =>  resp.json())
+        .then(data => {
+          if(!searchField.value.match(/^[a-zåäöA-ZÅÄÖ]+$/)) {
+            searchField.style.border = '2px solid red';
             searchField.value = "";
-            searchContainer.innerHTML +=`
-            <div class="entry">
-              <h3>${entry.title}</h3>
-              <p>Written by: <span class="highlight-author">${entry.username}</span></p>
-              <p>Posted: ${entry.createdAt}</p>
-              <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
-              ${btn}
-              ${amountLikes}
-            </div>`;
-          });
-          userEventListeners.likeComment();
-          userEventListeners.goToFullEntry();
+            return false;
+          }
+          else{
+            renderView(views.search);
+            let btn;
+            let amountLikes;
+            data.data.forEach(entry => {
+              if(data.loggedIn){
+                btn = `<i data-entryID='${entry.entryID}' class=" far fa-thumbs-up like-btn"></i>`;
+              }
+              else{
+                btn = `<i data-entryID='${entry.entryID}' class=" far fa-thumbs-up like-btn disable"></i>`;
+              }
+              if(entry.likes === null){
+                entry.likes = 0;
+              }
+              amountLikes = `<span class="likes">${entry.likes}</span>`
+              const searchContainer = document.getElementById("search-container");
+              searchField.value = "";
+              searchContainer.innerHTML +=`
+              <div class="entry">
+                <h3>${entry.title}</h3>
+                <p>Written by: <span class="highlight-author">${entry.username}</span></p>
+                <p>Posted: ${entry.createdAt}</p>
+                <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
+                ${btn}
+                ${amountLikes}
+              </div>`;
+            });
+            userEventListeners.likeEntry();
+            userEventListeners.goToFullEntry();
+          }
+        })
+        .catch(err => console.log(err));
         }
-      })
-      .catch(err => console.log(err));
       });
     });
  }
