@@ -37,8 +37,8 @@ const viewFetches = {
           entryContainer.innerHTML +=`
           <div class="entry" id="entry-${entry.entryID}">
             <h3>${entry.title}</h3>
-            <p>Written by: <span class="highlight-author">${entry.username}</span></p>
-            <p>Posted: ${entry.createdAt}</p>
+            <p>Posted by: <span class="highlight-author">${entry.username}</span></p>
+            <p class="created-at">${entry.createdAt}</p>
             <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
             ${btn}
             ${amountLikes}
@@ -70,8 +70,8 @@ const viewFetches = {
           trendingContainer.innerHTML +=`
           <div class="entry" id="entry-${entry.entryID}">
             <h3>${entry.title}</h3>
-            <p>Written by: <span class="highlight-author">${entry.username}</span></p>
-            <p>Posted: ${entry.createdAt}</p>
+            <p>Posted by: <span class="highlight-author">${entry.username}</span></p>
+            <p class="created-at">${entry.createdAt}</p>
             <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
             ${btn}
             ${amountLikes}
@@ -263,8 +263,8 @@ const userEventListeners = {
             entryContainer.innerHTML +=`
             <div class="entry" id="entry-${entry.entryID}">
               <h3>${entry.title}</h3>
-              <p>Written by: <span class="highlight-author">${entry.username}</span></p>
-              <p>Posted: ${entry.createdAt}</p>
+              <p>Posted by: <span class="highlight-author">${entry.username}</span></p>
+              <p class="created-at"<>${entry.createdAt}</p>
               <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
               ${btn}
               ${amountLikes}
@@ -550,8 +550,8 @@ const userEventListeners = {
               searchContainer.innerHTML +=`
               <div class="entry">
                 <h3>${entry.title}</h3>
-                <p>Written by: <span class="highlight-author">${entry.username}</span></p>
-                <p>Posted: ${entry.createdAt}</p>
+                <p>Posted by: <span class="highlight-author">${entry.username}</span></p>
+                <p class="created-at">${entry.createdAt}</p>
                 <button class="full-entry-btn" data-entryID='${entry.entryID}'>See Full Entry</button>
                 ${btn}
                 ${amountLikes}
