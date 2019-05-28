@@ -140,7 +140,7 @@ const viewFetches = {
         <h1>${data.title}</h1>
         <p>${data.content}<p>
         <p class="highlight-author">${data.username}<p>
-        <p class="italic">${data.createdAt}<p>
+        <p class="created-at italic">${data.createdAt}<p>
         <form id="comment-form">
         ${commentBox}<br>
         ${btn}
@@ -510,6 +510,7 @@ const userEventListeners = {
             }
           })
           .then(data => {
+            likeBtn.style.color = "rgb(82, 82, 224)";
             likeBtn.parentNode.querySelector('.likes').textContent = data.likes;
           })
           .catch(err => console.log(err));
