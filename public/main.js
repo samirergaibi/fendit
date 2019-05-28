@@ -230,6 +230,7 @@ const viewFetches = {
   }
 };
 
+let loadCounter = 20;
 const userEventListeners = {
   goToFullEntry: function(){
     const fullEntry = document.querySelectorAll(".full-entry-btn");
@@ -244,10 +245,9 @@ const userEventListeners = {
     const loadBtn = document.getElementById('load-btn');
     const entryContainer = document.getElementById("entry-container");
     loadBtn.addEventListener('click', function () {
-      fetch("/api/allentries")
+      fetch(`/api/load-more/${loadCounter}`)
         .then(resp=> resp.json())
         .then(data => {
-          loadBtn.style.display = 'none';
           let btn;
           let amountLikes;
           data.forEach(entry => {
@@ -269,7 +269,8 @@ const userEventListeners = {
               ${btn}
               ${amountLikes}
             </div>`;
-          })  
+          })
+          loadCounter += 2;
           userEventListeners.goToFullEntry();
           userEventListeners.likeEntry();
         })

@@ -8,10 +8,11 @@
             
             return $resp->withJson($entry->getLatestEntries());
         });
-        $app->get("/api/allentries", function($req, $resp){
+        $app->get("/api/load-more/{loadCounter}", function($req, $resp, $args){
+            $loadCounter = $args["loadCounter"];
             $entry = new Entry($this->db);
             
-            return $resp->withJson($entry->allEntries());
+            return $resp->withJson($entry->allEntries($loadCounter));
         });
 
         $app->get("/api/user-entries",function($req, $resp, $args){

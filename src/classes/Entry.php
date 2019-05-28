@@ -9,8 +9,9 @@
 
             return $statement->fetchAll(PDO::FETCH_ASSOC);
         }
-        public function allEntries(){
-            $statement = $this->db->prepare("SELECT * FROM entries INNER JOIN users ON entries.createdBy = users.userID ORDER BY createdAt DESC LIMIT 100 OFFSET 20");
+        public function allEntries($loadCounter){
+            $statement = $this->db->prepare("SELECT * FROM entries INNER JOIN users ON entries.createdBy = users.userID ORDER BY createdAt DESC LIMIT 2 OFFSET :loadCounter");
+            $statement->bindParam(":loadCounter", $loadCounter, PDO::PARAM_INT);
             $statement->execute();
 
             return $statement->fetchAll(PDO::FETCH_ASSOC);
