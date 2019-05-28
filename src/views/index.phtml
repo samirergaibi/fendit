@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title><?=$title?></title>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
@@ -14,6 +15,7 @@
   <a href="" data-template="users">Users</a>
   <a href="" data-template="trending">Trending</a>
   <a href="" data-template="login">Login</a>
+  <input type="text" name="search" id="search-loggedout" class="search" placeholder="Search..">
   
 </nav>
 <nav id="logged-in-nav">
@@ -22,7 +24,7 @@
   <a href="" data-template="trending">Trending</a>
   <a href="" data-template="users">Users</a>
   <a href="" data-template="logout">Logout</a>
-  <input type="text" name="search" id="search" placeholder="Search..">
+  <input type="text" name="search" id="search" class="search" placeholder="Search..">
 </nav>
 <?php
 

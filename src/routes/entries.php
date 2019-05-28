@@ -68,8 +68,19 @@
          $app->get('/api/search/{searchQuery}', function($req, $resp, $args){
             $entry = new Entry($this->db);
             $searchQuery = $args['searchQuery'];
-            return $resp->withJson($entry->search($searchQuery));
+            if( isset($_SESSION["loggedIn"]) ){
+                return $resp->withJson([
+                    "data" => $entry->search($searchQuery),
+                    "loggedIn" => $_SESSION["loggedIn"]
+                ]);
+            }else{
+                return $resp->withJson([
+                    "data" => $entry->search($searchQuery),
+                    "loggedIn" => false
+                ]);
+            }
          });
+         
          $app->get('/api/trending', function($req, $resp){
              $entry = new Entry($this->db);
              return $resp->withJson($entry->trending());
