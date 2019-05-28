@@ -69,6 +69,7 @@ nav a:hover{
   border: 1px solid black;
   padding: 10px;
   margin: 5px;
+  position: relative;
 }
 
 #error-msg{
@@ -173,7 +174,7 @@ transition: all 0.3s;
   position: relative;
 }
 
-.entry .created-at{
+.entry .created-at, .full-entry .created-at{
   position: absolute;
   bottom: 0;
   right: 10px;
@@ -214,3 +215,16 @@ transition: all 0.3s;
 
 /* SAMIR JOBBA ÖVER */
 /* TOBBE JOBBA UNDER */
+.full-entry .created-at{
+font-size: 20px;
+}
+
+.full-entry .highlight-author{
+  position: absolute;
+  bottom:30px;
+  right:10px;
+}
+
+textarea{
+  resize: none;
+}

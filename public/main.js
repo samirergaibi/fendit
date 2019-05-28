@@ -512,6 +512,7 @@ const userEventListeners = {
             }
           })
           .then(data => {
+            likeBtn.style.color = "rgb(82, 82, 224)";
             likeBtn.parentNode.querySelector('.likes').textContent = data.likes;
           })
           .catch(err => console.log(err));
