@@ -331,8 +331,9 @@ const userEventListeners = {
           formBtn.setAttribute("type", "submit");
           formBtn.setAttribute("value", "confirm");
           const breakElement = document.createElement("br");
+          const breakElement2 = document.createElement("br");
           
-          form.append(titleTextArea, breakElement, contentTextArea, formBtn);
+          form.append(titleTextArea, breakElement, contentTextArea,breakElement2,formBtn);
           entryContainer.append(form);
         } else{
           const editEntryForm = document.getElementById(`edit-entry-form-${entryID}`);

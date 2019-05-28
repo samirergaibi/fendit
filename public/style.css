@@ -30,7 +30,7 @@ body {
 }
 #users-container{
   text-align: center;
-  
+
 }
 
 header{
@@ -112,7 +112,7 @@ nav a:hover{
 
 /*  BUTTONS */
 
-.full-entry-btn{
+.full-entry-btn,input[type=submit],.edit-entry-btn,.create-comment,.edit-comment-btn{
   color: #ffffff;
   text-transform: uppercase;
   background: #355fb8;
@@ -122,32 +122,15 @@ nav a:hover{
   display: inline-block;
 }
 
-.full-entry-btn:hover{
+.full-entry-btn:hover,input[type=submit]:hover,.edit-entry-btn:hover,.create-comment:hover,.edit-comment-btn:hover{
 cursor: pointer;
-color: #ffffff;
-border-radius: 30px;
-border-color: #355fb8;
+background:#6782bb;
+border:1px solid #6782bb;
 transition: all 0.3s ease 0s;
 }
 
-.edit-entry-btn{
-  color: #ffffff;
-  text-transform: uppercase;
-  background: rgb(60, 141, 60);
-  padding: 5px;
-  border: 1px solid rgb(60, 141, 60);
-  border-radius: 6px;
-  display: inline-block;
-}
-.edit-entry-btn:hover{
-  cursor: pointer;
-  color: #ffffff;
-  border-radius: 50px;
-  border-color: rgb(60, 141, 60);
-  transition: all 0.3s ease 0s;
-  }
 
-.delete-entry-btn{
+.delete-entry-btn,.delete-comment-btn{
   color: #ffffff;
   text-transform: uppercase;
   background:rgb(201, 4, 4);
@@ -157,11 +140,11 @@ transition: all 0.3s ease 0s;
   display: inline-block;
 }
 
-.delete-entry-btn:hover{
+.delete-entry-btn:hover,.delete-comment-btn:hover{
   cursor: pointer;
   color: #ffffff;
-  border-radius: 50px;
-  border-color: rgb(201, 4, 4);
+  background: rgb(233, 65, 65);
+  border-color: rgb(233, 65, 65);
   transition: all 0.3s ease 0s;
 }
 
@@ -177,3 +160,5 @@ i{
   
 /* SAMIR JOBBA ÖVER */
 /* TOBBE JOBBA UNDER */
+
+
