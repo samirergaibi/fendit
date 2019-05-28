@@ -140,7 +140,7 @@ const viewFetches = {
         <h1>${data.title}</h1>
         <p>${data.content}<p>
         <p class="highlight-author">${data.username}<p>
-        <p class="italic">${data.createdAt}<p>
+        <p class="italic created-at">${data.createdAt}<p>
         <form id="comment-form">
         ${commentBox}<br>
         ${btn}
@@ -201,10 +201,10 @@ const viewFetches = {
           const userEntriesContainer = document.getElementById("user-entries-container");
           userEntriesContainer.innerHTML += `
           <div class="entry" id="entry-${entry.entryID}">
-            <h2 id="entry-title-${entry.entryID}">${entry.title}</h2>
-            <p id="entry-content-${entry.entryID}">${entry.content}</p>
-            <p class="highlight-author">${entry.username}</p>
-            <p class="italic">${entry.createdAt}</p>
+            <p class="highlight-author entry-username">${entry.username}</p>
+            <p id="entry-title-${entry.entryID}" class="entry-title">${entry.title}</p>
+            <p id="entry-content-${entry.entryID}" class="entry-content">${entry.content}</p>
+            <p class="italic created-at">${entry.createdAt}</p>
             <button data-entryid="${entry.entryID}" class="full-entry-btn">Full Entry</button>
             <button data-entryid="${entry.entryID}" class="edit-entry-btn">Edit</button>
             <button data-entryid="${entry.entryID}" class="delete-entry-btn">Remove</button>
@@ -271,8 +271,10 @@ const userEventListeners = {
             </div>`;
           })
           loadCounter += 2;
-          userEventListeners.goToFullEntry();
-          userEventListeners.likeEntry();
+          if(data.length > 0){
+            userEventListeners.goToFullEntry();
+            userEventListeners.likeEntry();
+          }
         })
         .catch(err => console.log(err));
     });
@@ -524,7 +526,7 @@ const userEventListeners = {
           fetch(`/api/search/${searchField.value}`)
         .then(resp =>  resp.json())
         .then(data => {
-          if(!searchField.value.match(/^[a-zåäöA-ZÅÄÖ]+$/)) {
+          if(!searchField.value.match(/^[a-zåäöA-ZÅÄÖ ]+$/)) {
             searchField.style.border = '2px solid red';
             searchField.value = "";
             return false;
