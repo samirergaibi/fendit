@@ -298,7 +298,6 @@ const userEventListeners = {
         .then(data => {
           renderView(views.userEntries);
           viewFetches.userEntries();
-          // Meddelandet skrivs inte ut, troligtvis pga. att det renderas innan ovanstående funktionsanrop
           const createEntryMsg = document.getElementById("create-entry-msg");
           createEntryMsg.innerHTML += `<p>${data.message}</p>`;
         })
@@ -581,7 +580,6 @@ function renderView(view) {
   });
 };
 
-// When entering site we ping to check if the user is logged in or not and show appropriate view
 function showCorrectView(view, entryID) {
   fetch("/api/ping")
     .then(resp => {

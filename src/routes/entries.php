@@ -54,7 +54,6 @@
            $entry = new Entry($this->db);
            $entryID = $args['entryID'];
            $data = $req->getParsedBody();
-        //    $entry->updateEntry($data['title'], $data['content'], $entryID);
            
            return $resp->withJson($entry->updateEntry($data["title"], $data["content"], $entryID));
          });
