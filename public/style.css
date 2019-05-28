@@ -28,6 +28,10 @@ body {
 .container main{
   background: #ffffff;
 }
+#users-container{
+  text-align: center;
+  
+}
 
 header{
   background: black;
@@ -36,6 +40,8 @@ header{
 
 header h1{
   text-align: center;
+  padding:20px;
+  margin:0; 
 }
 
 main {

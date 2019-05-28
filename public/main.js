@@ -228,11 +228,10 @@ const viewFetches = {
       .then(resp => resp.json())
       .then(data => {
         const usersContainer = document.getElementById("users-container");
-        usersContainer.innerHTML = "<ul>";
+        
         data.forEach(user => {
-          usersContainer.innerHTML += `<li>${user.username}</li>`;
+          usersContainer.innerHTML += `<p>${user.username}</p>`;
         })
-        usersContainer.innerHTML += "</ul>";
       })
   }
 };
